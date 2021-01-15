@@ -1,4 +1,4 @@
 /target
-Cargo.lock
-/pkg
+/package
+/public
 private
