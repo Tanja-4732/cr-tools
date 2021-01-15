@@ -1,6 +1,29 @@
 #!/bin/bash
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+if [[ -z "${USE_VERCEL}" ]]; then
+
+  # Skip installation
+  echo "Skip install (define USE_VERCEL to run installation steps)"
+
+else
+
+  # Install dependencies for Vercel
+  echo "Installing vercel dependencies..."
+
+  # Install Rust
+  amazon-linux-extras install rust1
+
+  # Install rollup
+  npm i -g rollup
+
+  # Install wasm-pack
+  cargo install wasm-pack --locked
+
+  # Update the PATH
+  export PATH=$PATH:/vercel/.cargo/bin
+fi
+
 echo "Building cr-tools in"
 pwd
 
