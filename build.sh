@@ -14,6 +14,9 @@ else
   # Install Rust
   amazon-linux-extras install rust1
 
+  # Add the wasm32 target to Rust
+  rustup target add wasm32-unknown-unknown
+
   # Install rollup
   npm i -g rollup
 
