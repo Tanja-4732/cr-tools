@@ -6,7 +6,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 if [[ -z "${INSTALL_DIRECTLY}" ]]; then
 
   # Skip installation
-  echo "Skip install (define INSTALL_DIRECTLY to run installation steps)"
+  echo "Skip install (define INSTALL_DIRECTLY to install build dependencies)"
 
 else
 
