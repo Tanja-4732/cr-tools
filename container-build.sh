@@ -17,6 +17,9 @@ else
 
   # Install Docker
   amazon-linux-extras install docker
+
+  # Start the Docker deamon
+  systemctl start docker
 fi
 
 # Run the build in Docker
