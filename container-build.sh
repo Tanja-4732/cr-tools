@@ -13,13 +13,7 @@ if [[ -z "${INSTALL_DOCKER}" ]]; then
 else
 
   # Install dependencies for Vercel
-  echo "Installing vercel dependencies..."
-
-  # Install Docker
-  amazon-linux-extras install docker
-
-  # Pull the build image
-  docker pull berndl/yew-build-img:0.0.1
+  echo "Installing Vercel dependencies..."
 
   # # Install rootless Docker
   # export PATH="$PATH:/sbin:/usr/sbin:usr/local/sbin"
