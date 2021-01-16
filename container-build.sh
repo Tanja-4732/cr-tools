@@ -19,7 +19,7 @@ else
   amazon-linux-extras install docker
 
   # Start the Docker deamon
-  systemctl start docker
+  service docker start
   whoami
 fi
 
