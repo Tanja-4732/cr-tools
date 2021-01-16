@@ -38,6 +38,27 @@ pub struct DonationSize {
     rare: usize,
 }
 
+/// Returns the daily donation limit for a given arena
+pub fn get_donation_limit(arena: &Arena) -> usize {
+    match arena {
+        Arena::TrainingCamp => 0,
+        Arena::GoblinStadium => 90,
+        Arena::BonePit => 90,
+        Arena::BarbarianBowl => 90,
+        Arena::PekkasPlayhouse => 180,
+        Arena::SpellValley => 180,
+        Arena::BuildersWorkshop => 180,
+        Arena::RoyalArena => 270,
+        Arena::FrozenPeak => 270,
+        Arena::JungleArena => 270,
+        Arena::HogMountain => 360,
+        Arena::ElectroValley => 360,
+        Arena::SpookyTown => 360,
+        Arena::LegendaryArena => 360,
+    }
+}
+
+/// Returns the donation size limit for a given arena
 pub fn get_donation_size(arena: &Arena) -> DonationSize {
     match arena {
         Arena::TrainingCamp => DonationSize { common: 0, rare: 0 },
@@ -57,6 +78,7 @@ pub fn get_donation_size(arena: &Arena) -> DonationSize {
     }
 }
 
+/// Returns the request size limit for a given arena
 pub fn get_request_size(arena: &Arena) -> RequestSize {
     use RequestSize as Rs;
 
