@@ -10,29 +10,29 @@ if [[ -z "${INSTALL_DIRECTLY}" ]]; then
 
 else
 
-  # Install dependencies for Vercel
-  echo "Installing Vercel dependencies..."
+  # Install dependencies for build
+  echo "Installing build dependencies..."
 
   # Install rustup & Rust
   curl https://sh.rustup.rs -sSf | sh -s -- -y
 
-  # Install curl for the wasm-pack installation
-  apt-get -yqq update
-  # apt-get -yqq install curl
+  # Add the .cargo/bin folder to PATH
+  export PATH=$PATH:$HOME/.cargo/bin
+
+  # Install tar, which, gzip & gcc
+  yum install -y tar which gzip gcc
 
   # Install wasm-pack and its target architecture wasm32-unknown-unknown
   curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-  # Install cargo-generate using cargo
-  apt-get -yqq install pkg-config libssl-dev git
-  cargo install cargo-generate
+  # Install & activate nvm
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+  . ~/.nvm/nvm.sh
 
-  # Install Node.js
-  apt-get -yqq install gnupg
-  curl -sL https://deb.nodesource.com/setup_14.x | bash -
-  apt-get install -yqq nodejs
+  # Use nvm to install Node.js
+  nvm install node
 
-  # Install Rollup
+  # Install Rollup using npm
   npm i -g rollup
 
 fi
