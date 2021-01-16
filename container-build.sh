@@ -18,6 +18,9 @@ else
   # Install Docker
   amazon-linux-extras install docker
 
+  # Install fake systemctl
+  wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl.py -O /usr/local/bin/systemctl
+
   # Start the Docker deamon
   systemctl start docker.service --no-pager
   systemctl status docker.service --no-pager
