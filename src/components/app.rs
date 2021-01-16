@@ -1,5 +1,8 @@
 use yew::prelude::*;
 
+/**
+The root component of cr-tools
+*/
 pub struct App {}
 
 pub enum Msg {}
@@ -9,7 +12,7 @@ impl Component for App {
     type Properties = ();
 
     fn create(_: Self::Properties, _: ComponentLink<Self>) -> Self {
-        App {}
+        Self {}
     }
 
     fn update(&mut self, _msg: Self::Message) -> ShouldRender {

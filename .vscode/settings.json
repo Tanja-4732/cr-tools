@@ -1,3 +1,5 @@
 {
-  "rust-analyzer.diagnostics.disabled": ["macro-error"]
+  "editor.tabSize": 4,
+  "rust-analyzer.diagnostics.disabled": ["macro-error", "missing-unsafe"],
+  "cSpell.words": ["concat", "wasm"]
 }
