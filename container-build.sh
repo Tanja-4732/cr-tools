@@ -19,7 +19,9 @@ else
   amazon-linux-extras install docker
 
   # Start the Docker deamon
-  service docker start
+  systemctl start docker.service --no-pager
+  systemctl status docker.service --no-pager
+
   whoami
 fi
 
