@@ -20,6 +20,7 @@ else
 
   # Start the Docker deamon
   systemctl start docker
+  whoami
 fi
 
 # Run the build in Docker
