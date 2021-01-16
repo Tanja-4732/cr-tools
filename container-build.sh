@@ -15,21 +15,24 @@ else
   # Install dependencies for Vercel
   echo "Installing vercel dependencies..."
 
-  # # Install Docker
-  # amazon-linux-extras install docker
+  # Install Docker
+  amazon-linux-extras install docker
 
-  # Install rootless Docker
-  export PATH="$PATH:/sbin:/usr/sbin:usr/local/sbin"
-  adduser docki
-  su docki
-  curl -fsSL https://get.docker.com/rootless | sh
+  # Pull the build image
+  docker pull berndl/yew-build-img:0.0.1
 
-  # Start the Docker daemon in the background
-  dockerd &
-  echo "Started docker (waiting 10 seconds)"
-  sleep 10s
+  # # Install rootless Docker
+  # export PATH="$PATH:/sbin:/usr/sbin:usr/local/sbin"
+  # adduser docki
+  # su docki
+  # curl -fsSL https://get.docker.com/rootless | sh
 
-  whoami
+  # # Start the Docker daemon in the background
+  # dockerd &
+  # echo "Started docker (waiting 10 seconds)"
+  # sleep 10s
+
+  # whoami
 fi
 
 # Run the build in Docker
