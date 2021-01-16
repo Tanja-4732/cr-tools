@@ -19,6 +19,7 @@ else
   # amazon-linux-extras install docker
 
   # Install rootless Docker
+  export PATH="$PATH:/sbin:/usr/sbin:usr/local/sbin"
   adduser docki
   su docki
   curl -fsSL https://get.docker.com/rootless | sh
