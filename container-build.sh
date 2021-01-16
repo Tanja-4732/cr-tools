@@ -15,8 +15,13 @@ else
   # Install dependencies for Vercel
   echo "Installing vercel dependencies..."
 
-  # Install Docker
-  amazon-linux-extras install docker
+  # # Install Docker
+  # amazon-linux-extras install docker
+
+  # Install rootless Docker
+  adduser docki
+  su docki
+  curl -fsSL https://get.docker.com/rootless | sh
 
   # Start the Docker daemon in the background
   dockerd &
