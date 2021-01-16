@@ -1,16 +1,15 @@
-use super::card_info::CardInfo;
 use yew::prelude::*;
 
-/**
-The root component of cr-tools
-*/
-pub struct App {}
+/// The root component of cr-tools
+pub struct CardInfo {}
 
 pub enum Msg {}
+#[derive(Properties, Clone)]
+pub struct Props {}
 
-impl Component for App {
+impl Component for CardInfo {
     type Message = Msg;
-    type Properties = ();
+    type Properties = Props;
 
     fn create(_: Self::Properties, _: ComponentLink<Self>) -> Self {
         Self {}
@@ -26,15 +25,7 @@ impl Component for App {
 
     fn view(&self) -> Html {
         html! {
-            <>
-
-                <p>{ "Hello world! cr-tools" }</p>
-
-                <CardInfo />
-                <CardInfo />
-                <CardInfo />
-
-            </>
+            <p>{ "card details here" }</p>
         }
     }
 }
