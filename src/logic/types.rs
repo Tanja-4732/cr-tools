@@ -29,13 +29,13 @@ pub enum Arena {
 }
 
 pub struct RequestSize {
-    common: usize,
-    rare: usize,
+    pub common: usize,
+    pub rare: usize,
 }
 
 pub struct DonationSize {
-    common: usize,
-    rare: usize,
+    pub common: usize,
+    pub rare: usize,
 }
 
 /// Returns the daily donation limit for a given arena
