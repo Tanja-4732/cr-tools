@@ -1,13 +1,12 @@
 use super::card_info::CardInfo;
-use super::card_input::CardInput;
 use yew::prelude::*;
 
-/// The root component of cr-tools
-pub struct App {}
+/// The listing of the cards to keep track of
+pub struct CardsListing {}
 
 pub enum Msg {}
 
-impl Component for App {
+impl Component for CardsListing {
     type Message = Msg;
     type Properties = ();
 
@@ -25,13 +24,15 @@ impl Component for App {
 
     fn view(&self) -> Html {
         html! {
-            <div>
+            <>
 
-                <h1>{ "cr-tools" }</h1>
+                <p>{ "Hello world! cr-tools" }</p>
 
-                <CardInput />
+                <CardInfo />
+                <CardInfo />
+                <CardInfo />
 
-            </div>
+            </>
         }
     }
 }
