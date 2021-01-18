@@ -1,3 +1,5 @@
+#![recursion_limit = "256"]
+
 // Export as library
 pub mod logic;
 

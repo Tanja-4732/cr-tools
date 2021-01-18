@@ -1,17 +1,21 @@
+use serde_derive::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct CardEntry {
     /// The name of the card
-    name: String,
+    pub name: String,
 
     /// The amount of cards in posession
-    have: usize,
+    pub have: usize,
 
     /// The amount of cards required to upgrade
-    need: usize,
+    pub need: usize,
 
     /// The rarity of the card
-    card_type: CardType,
+    pub card_type: CardType,
 }
 
+#[derive(Serialize, Deserialize)]
 pub enum CardType {
     Troop,
     Spell,

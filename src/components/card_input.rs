@@ -1,3 +1,5 @@
+use crate::logic::types::{CardEntry, CardType};
+use std::cmp;
 use std::iter::Filter;
 
 use super::card_info::CardInfo;
@@ -25,16 +27,9 @@ pub struct CardInput {
 
 #[derive(Serialize, Deserialize)]
 pub struct State {
-    cards: Vec<Entry>,
+    cards: Vec<CardEntry>,
     value: String,
     edit_value: String,
-}
-
-#[derive(Serialize, Deserialize)]
-struct Entry {
-    description: String,
-    completed: bool,
-    editing: bool,
 }
 
 pub enum Msg {
@@ -79,7 +74,19 @@ impl Component for CardInput {
         }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        match msg {
+            Msg::Create => self.state.cards.push(CardEntry {
+                card_type: CardType::Building,
+                have: 42,
+                need: 100,
+                name: "My Card".to_owned(),
+            }),
+            Msg::Update => {}
+            Msg::Delete => {}
+            Msg::NoOp => {}
+        }
+
         true
     }
 
@@ -90,21 +97,46 @@ impl Component for CardInput {
     fn view(&self) -> Html {
         html! {
             <div style=MY_STYLE>
+                // Render all cards
+                { for self.state.cards.iter().map(|c| self.view_card(c)) }
 
+                // The input fields for new cards
                 <input placeholder="name" />
                 <input placeholder="need" />
                 <input placeholder="have" />
-
-                // { for self.props.items.iter().map(renderItem) }
-
+                <button onclick=self.link.callback(|_| Msg::Create)> {"Add"} </button>
 
             </div>
         }
     }
 }
 
+impl CardInput {
+    fn view_card(&self, card: &CardEntry) -> Html {
+        html! {
+            <>
+
+            // The input fields for new cards
+            <input placeholder="name" value={card.name.to_owned()}/>
+            <input placeholder="need" value={card.need}/>
+            <input placeholder="have" value={card.have}/>
+
+            // The calculated outputs for the card
+            <p>{"Remaining: "} { cmp::min(card.need - card.have, 0)}</p>
+            <p>{"Requests: "}</p>
+            <p>{"Weeks: "}</p>
+            <p>{"Days: "}</p>
+            <p>{"Days in order: "}</p>
+            <p>{"Done at: "}</p>
+            <p>{"Done in order: "}</p>
+
+            </>
+        }
+    }
+}
+
 const MY_STYLE: &str = "
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(10, 1fr);
     gap: 5px;
 ";
