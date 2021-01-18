@@ -122,7 +122,7 @@ impl CardInput {
             <input placeholder="have" value={card.have}/>
 
             // The calculated outputs for the card
-            <p>{"Remaining: "} { cmp::min(card.need - card.have, 0)}</p>
+            <p>{"Remaining: "} { cmp::max(card.need - card.have, 0)}</p>
             <p>{"Requests: "}</p>
             <p>{"Weeks: "}</p>
             <p>{"Days: "}</p>
@@ -137,6 +137,6 @@ impl CardInput {
 
 const MY_STYLE: &str = "
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
+    grid-template-columns: repeat(10, auto);
     gap: 5px;
 ";
