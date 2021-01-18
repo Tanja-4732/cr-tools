@@ -1,4 +1,4 @@
-use crate::logic::types::{CardEntry, CardType};
+use crate::logic::types::{CardEntry, CardType, Rarity};
 use std::cmp;
 use std::iter::Filter;
 
@@ -33,7 +33,7 @@ pub struct State {
 }
 
 pub enum Msg {
-    Create,
+    Create(MouseEvent),
     Update,
     Delete,
     NoOp,
@@ -76,17 +76,21 @@ impl Component for CardInput {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::Create => self.state.cards.push(CardEntry {
+            Msg::Create(c) => self.state.cards.push(CardEntry {
                 card_type: CardType::Building,
                 have: 42,
                 need: 100,
-                name: "My Card".to_owned(),
+                name: format!("{:?}", c),
             }),
             Msg::Update => {}
             Msg::Delete => {}
             Msg::NoOp => {}
         }
 
+        // Persist the data
+        self.storage.store(KEY, Json(&self.state.cards));
+
+        // Re-render
         true
     }
 
@@ -98,13 +102,16 @@ impl Component for CardInput {
         html! {
             <div style=MY_STYLE>
                 // Render all cards
-                { for self.state.cards.iter().map(|c| self.view_card(c)) }
+                { for self.state.cards.iter().map(|card| self.view_card(card)) }
 
                 // The input fields for new cards
                 <input placeholder="name" />
                 <input placeholder="need" />
                 <input placeholder="have" />
-                <button onclick=self.link.callback(|_| Msg::Create)> {"Add"} </button>
+                <select>
+                    { self.get_rarities() }
+                </select>
+                <button onclick=self.link.callback(|c| Msg::Create(c))> {"Add"} </button>
 
             </div>
         }
@@ -120,6 +127,9 @@ impl CardInput {
             <input placeholder="name" value={card.name.to_owned()}/>
             <input placeholder="need" value={card.need}/>
             <input placeholder="have" value={card.have}/>
+            <select>
+                { self.get_rarities() }
+            </select>
 
             // The calculated outputs for the card
             <p>{"Remaining: "} { cmp::max(card.need - card.have, 0)}</p>
@@ -133,10 +143,22 @@ impl CardInput {
             </>
         }
     }
+
+    fn get_rarities(&self) -> Html {
+        // TODO cache/memoize this
+
+        Rarity::iter()
+            .map(|rarity| {
+                let name = format!("{:?}", rarity);
+
+                html! {<option value=name> {name} </option>}
+            })
+            .collect::<Html>()
+    }
 }
 
 const MY_STYLE: &str = "
     display: grid;
-    grid-template-columns: repeat(10, auto);
+    grid-template-columns: repeat(11, auto);
     gap: 5px;
 ";
