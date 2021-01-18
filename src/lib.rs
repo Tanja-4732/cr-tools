@@ -10,7 +10,7 @@ use wasm_bindgen::prelude::*;
 use yew::web_sys::console;
 
 /// The app's main entry point
-#[wasm_bindgen]
+#[wasm_bindgen(start)]
 pub fn run_app() -> Result<(), JsValue> {
     // Log the license notice
     console::group_1(&constants::license::license_notice_title().into());

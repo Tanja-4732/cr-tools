@@ -20,29 +20,17 @@ else
   export PATH=$PATH:$HOME/.cargo/bin
 
   # Install tar, which, gzip & gcc
-  yum install -y tar which gzip gcc
+  yum install -y tar which gzip gcc openssl-devel
 
   # Install wasm-pack and its target architecture wasm32-unknown-unknown
   curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-  # Install & activate nvm
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-  . ~/.nvm/nvm.sh
-
-  # Use nvm to install Node.js
-  nvm install node
-
-  # Install Rollup using npm
-  npm i -g rollup
 
 fi
 
 # Compile the rust code
 wasm-pack build --target web -d package
 
-# Create a JavaScript bundle
-rollup ./web/main.js --format iife --file ./public/bundle.js
-
-# Copy the HTML & WASM files
-cp ./web/index.html ./package/cr_tools_bg.wasm ./public
+# Copy the HTML, JavaScript & WASM files
+mkdir -p public
+cp ./src/index.html ./package/cr_tools.js ./package/cr_tools_bg.wasm ./public
 echo Copied index.html

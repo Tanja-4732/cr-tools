@@ -1,3 +1,17 @@
+pub struct CardEntry {
+    /// The name of the card
+    name: String,
+
+    /// The amount of cards in posession
+    have: usize,
+
+    /// The amount of cards required to upgrade
+    need: usize,
+
+    /// The rarity of the card
+    card_type: CardType,
+}
+
 pub enum CardType {
     Troop,
     Spell,
