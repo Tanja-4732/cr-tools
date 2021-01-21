@@ -81,6 +81,7 @@ impl Component for CardInput {
                 have: 42,
                 need: 100,
                 name: format!("{:?}", c),
+                rarity: Rarity::Rare,
             }),
             Msg::Update => {}
             Msg::Delete => {}
@@ -109,7 +110,7 @@ impl Component for CardInput {
                 <input placeholder="need" />
                 <input placeholder="have" />
                 <select>
-                    { self.get_rarities() }
+                    { self.get_rarities(None) }
                 </select>
                 <button onclick=self.link.callback(|c| Msg::Create(c))> {"Add"} </button>
 
@@ -128,7 +129,7 @@ impl CardInput {
             <input placeholder="need" value={card.need}/>
             <input placeholder="have" value={card.have}/>
             <select>
-                { self.get_rarities() }
+                { self.get_rarities(Some(&card)) }
             </select>
 
             // The calculated outputs for the card
@@ -144,14 +145,20 @@ impl CardInput {
         }
     }
 
-    fn get_rarities(&self) -> Html {
+    fn get_rarities(&self, card: Option<&CardEntry>) -> Html {
         // TODO cache/memoize this
 
         Rarity::iter()
             .map(|rarity| {
                 let name = format!("{:?}", rarity);
 
-                html! {<option value=name> {name} </option>}
+                let should_select = if let Some(c) = card {
+                    c.rarity == rarity
+                } else {
+                    false
+                };
+
+                html! {<option value=name selected={should_select}> {name} </option>}
             })
             .collect::<Html>()
     }
