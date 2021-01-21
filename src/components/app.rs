@@ -28,6 +28,11 @@ impl Component for App {
             <div>
 
                 <h1>{ "cr-tools" }</h1>
+                <p>
+                    { "This app is a work in progress, and my first Yew project." }
+                    <br />
+                    { "Some functionality might not be implemented yet. Please be patient." }
+                </p>
 
                 <CardInput />
 
