@@ -6,12 +6,15 @@ use super::card_info::CardInfo;
 use yew::prelude::*;
 
 use serde_derive::{Deserialize, Serialize};
+use std::str::FromStr;
 use strum::IntoEnumIterator;
 use strum_macros::{EnumIter, ToString};
 use wasm_bindgen::prelude::*;
+use yew::events::ChangeData;
 use yew::events::KeyboardEvent;
 use yew::format::Json;
 use yew::services::storage::{Area, StorageService};
+use yew::web_sys::console;
 use yew::web_sys::HtmlInputElement as InputElement;
 use yew::{html, Component, ComponentLink, Href, Html, InputData, NodeRef, ShouldRender};
 
@@ -66,12 +69,27 @@ impl Component for CardInput {
                 have: 0,
                 need: 0,
                 card_type: CardType::Building,
-                rarity: Rarity::Rare,
+                rarity: Rarity::Common,
             },
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        match msg {
+            Msg::NoOp => {}
+            Msg::UpdateName(name) => self.card.name = name,
+            Msg::UpdateNeed(need) => self.card.need = need,
+            Msg::UpdateHave(have) => self.card.have = have,
+            Msg::UpdateRarity(rarity) => self.card.rarity = rarity,
+            Msg::Create => {
+                // Push the card onto the list
+                self.cards.push(self.card.clone());
+
+                // Persist the data
+                self.storage.store(KEY, Json(&self.cards));
+            }
+        }
+
         // Re-render
         true
     }
@@ -85,10 +103,16 @@ impl Component for CardInput {
             <>
 
                 // The input fields for new cards
-                <input placeholder="name" />
-                <input placeholder="need" />
-                <input placeholder="have" />
-                <select>
+                <input placeholder="name" oninput={self.link.callback(|i: InputData| Msg::UpdateName(i.value))} />
+                <input placeholder="need" oninput={self.link.callback(|i: InputData| Msg::UpdateNeed(i.value.parse::<usize>().unwrap()))} />
+                <input placeholder="have" oninput={self.link.callback(|i: InputData| Msg::UpdateHave(i.value.parse::<usize>().unwrap()))} />
+                <select onchange={self.link.callback(|i: ChangeData| {
+                    if let yew::events::ChangeData::Select(data) = i {
+                        Msg::UpdateRarity(Rarity::from_str(&data.value()).unwrap())
+                    } else {
+                        panic!("Big oof");
+                    }
+                })} >
                     { self.get_rarities(None) }
                 </select>
                 <button onclick=self.link.callback(|c| Msg::Create)> {"Add"} </button>
@@ -117,9 +141,3 @@ impl CardInput {
             .collect::<Html>()
     }
 }
-
-const MY_STYLE: &str = "
-    display: grid;
-    grid-template-columns: repeat(11, auto);
-    gap: 5px;
-";

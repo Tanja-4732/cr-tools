@@ -138,9 +138,3 @@ impl CardsListing {
             .collect::<Html>()
     }
 }
-
-const MY_STYLE: &str = "
-    display: grid;
-    grid-template-columns: repeat(11, auto);
-    gap: 5px;
-";

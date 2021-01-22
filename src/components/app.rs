@@ -31,6 +31,8 @@ impl Component for App {
             { "This app is a work in progress, and my first Yew project." }
             <br />
             { "Some functionality might not be implemented yet. Please be patient." }
+            <br />
+            <em>{ "Reload after adding a card" }</em>
             </p>
 
             <div style=MY_STYLE>

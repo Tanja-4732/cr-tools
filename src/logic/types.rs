@@ -1,5 +1,5 @@
 use serde_derive::{Deserialize, Serialize};
-use strum_macros::EnumIter;
+use strum_macros::{EnumIter, EnumString};
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct CardEntry {
@@ -26,7 +26,7 @@ pub enum CardType {
     Building,
 }
 
-#[derive(Serialize, Deserialize, Debug, EnumIter, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, EnumIter, EnumString, PartialEq, Clone)]
 pub enum Rarity {
     Common,
     Rare,
