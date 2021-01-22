@@ -20,22 +20,18 @@ const KEY: &str = "cr-tools.state.cards";
 /// Enter information about a card
 pub struct CardInput {
     link: ComponentLink<Self>,
-    storage: StorageService,
-    state: State,
     focus_ref: NodeRef,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct State {
     cards: Vec<CardEntry>,
-    value: String,
-    edit_value: String,
+    card: CardEntry,
+    storage: StorageService,
 }
 
 pub enum Msg {
-    Create(MouseEvent),
-    Update,
-    Delete,
+    Create,
+    UpdateName(String),
+    UpdateNeed(usize),
+    UpdateHave(usize),
+    UpdateRarity(Rarity),
     NoOp,
 }
 
@@ -57,40 +53,25 @@ impl Component for CardInput {
             }
         };
 
-        let state = State {
-            cards,
-            value: "".into(),
-            edit_value: "".into(),
-        };
-
         // TODO maybe remove
         let focus_ref = NodeRef::default();
 
         Self {
             link,
-            storage,
-            state,
             focus_ref,
+            cards,
+            storage,
+            card: CardEntry {
+                name: String::new(),
+                have: 0,
+                need: 0,
+                card_type: CardType::Building,
+                rarity: Rarity::Rare,
+            },
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        match msg {
-            Msg::Create(c) => self.state.cards.push(CardEntry {
-                card_type: CardType::Building,
-                have: 42,
-                need: 100,
-                name: format!("{:?}", c),
-                rarity: Rarity::Rare,
-            }),
-            Msg::Update => {}
-            Msg::Delete => {}
-            Msg::NoOp => {}
-        }
-
-        // Persist the data
-        self.storage.store(KEY, Json(&self.state.cards));
-
         // Re-render
         true
     }
@@ -101,9 +82,7 @@ impl Component for CardInput {
 
     fn view(&self) -> Html {
         html! {
-            <div style=MY_STYLE>
-                // Render all cards
-                { for self.state.cards.iter().map(|card| self.view_card(card)) }
+            <>
 
                 // The input fields for new cards
                 <input placeholder="name" />
@@ -112,39 +91,14 @@ impl Component for CardInput {
                 <select>
                     { self.get_rarities(None) }
                 </select>
-                <button onclick=self.link.callback(|c| Msg::Create(c))> {"Add"} </button>
+                <button onclick=self.link.callback(|c| Msg::Create)> {"Add"} </button>
 
-            </div>
+            </>
         }
     }
 }
 
 impl CardInput {
-    fn view_card(&self, card: &CardEntry) -> Html {
-        html! {
-            <>
-
-            // The input fields for new cards
-            <input placeholder="name" value={card.name.to_owned()}/>
-            <input placeholder="need" value={card.need}/>
-            <input placeholder="have" value={card.have}/>
-            <select>
-                { self.get_rarities(Some(&card)) }
-            </select>
-
-            // The calculated outputs for the card
-            <p>{"Remaining: "} { cmp::max(card.need - card.have, 0)}</p>
-            <p>{"Requests: "}</p>
-            <p>{"Weeks: "}</p>
-            <p>{"Days: "}</p>
-            <p>{"Days in order: "}</p>
-            <p>{"Done at: "}</p>
-            <p>{"Done in order: "}</p>
-
-            </>
-        }
-    }
-
     fn get_rarities(&self, card: Option<&CardEntry>) -> Html {
         // TODO cache/memoize this
 

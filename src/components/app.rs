@@ -1,5 +1,4 @@
-use super::card_info::CardInfo;
-use super::card_input::CardInput;
+use super::{card_info::CardInfo, card_input::CardInput, cards_listing::CardsListing};
 use yew::prelude::*;
 
 /// The root component of cr-tools
@@ -25,18 +24,27 @@ impl Component for App {
 
     fn view(&self) -> Html {
         html! {
-            <div>
+            <>
 
-                <h1>{ "cr-tools" }</h1>
-                <p>
-                    { "This app is a work in progress, and my first Yew project." }
-                    <br />
-                    { "Some functionality might not be implemented yet. Please be patient." }
-                </p>
+            <h1>{ "cr-tools" }</h1>
+            <p>
+            { "This app is a work in progress, and my first Yew project." }
+            <br />
+            { "Some functionality might not be implemented yet. Please be patient." }
+            </p>
 
+            <div style=MY_STYLE>
+                <CardsListing />
                 <CardInput />
-
             </div>
+
+            </>
         }
     }
 }
+
+const MY_STYLE: &str = "
+    display: grid;
+    grid-template-columns: repeat(11, auto);
+    gap: 5px;
+";
