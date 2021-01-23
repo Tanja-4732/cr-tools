@@ -131,6 +131,13 @@ impl CardsListing {
             }
         } else {
             // Handle legendary cards
+
+            let cards_remaining = if card.get_needed() < card.have {
+                0
+            } else {
+                card.get_needed() - card.have
+            };
+
             html! {
                 <>
 
@@ -144,7 +151,7 @@ impl CardsListing {
 
                 // The calculated outputs for the card
                 <span>{"Need: "} {card.get_needed()}</span>
-                <span>{"Remaining: "} { cmp::max(card.get_needed() - card.have, 0)}</span>
+                <span>{"Remaining: "} { cards_remaining }</span>
                 <span>{"Requests: n/a"}</span>
                 <span>{"Weeks: n/a"}</span>
                 <span>{"Days: n/a"}</span>

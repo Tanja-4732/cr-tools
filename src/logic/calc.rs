@@ -25,7 +25,11 @@ impl CardEntry {
         // The arena the user is in (default to the LegendaryArena)
         let request_size = get_request_size(&arena.unwrap_or(Arena::LegendaryArena));
 
-        let cards_remaining = cmp::max(self.get_needed() as isize - self.have as isize, 0) as usize;
+        let cards_remaining = if self.get_needed() < self.have {
+            0
+        } else {
+            self.get_needed() - self.have
+        };
 
         let requests_remaining = (cards_remaining as f64
             / if self.rarity == Rarity::Common {
