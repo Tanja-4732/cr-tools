@@ -103,16 +103,16 @@ impl Component for CardInput {
             <>
 
                 // The input fields for new cards
-                <input placeholder="name" oninput={self.link.callback(|i: InputData| Msg::UpdateName(i.value))} />
-                <input placeholder="need" oninput={self.link.callback(|i: InputData| Msg::UpdateNeed(i.value.parse::<usize>().unwrap()))} />
-                <input placeholder="have" oninput={self.link.callback(|i: InputData| Msg::UpdateHave(i.value.parse::<usize>().unwrap()))} />
-                <select onchange={self.link.callback(|i: ChangeData| {
+                <input placeholder="name" oninput=self.link.callback(|i: InputData| Msg::UpdateName(i.value)) />
+                <input placeholder="need" oninput=self.link.callback(|i: InputData| Msg::UpdateNeed(i.value.parse::<usize>().unwrap())) />
+                <input placeholder="have" oninput=self.link.callback(|i: InputData| Msg::UpdateHave(i.value.parse::<usize>().unwrap())) />
+                <select onchange=self.link.callback(|i: ChangeData| {
                     if let yew::events::ChangeData::Select(data) = i {
                         Msg::UpdateRarity(Rarity::from_str(&data.value()).unwrap())
                     } else {
                         panic!("Big oof");
                     }
-                })} >
+                }) >
                     { self.get_rarities(None) }
                 </select>
                 <button onclick=self.link.callback(|c| Msg::Create)> {"Add"} </button>
