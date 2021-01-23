@@ -161,3 +161,18 @@ pub fn get_request_size(arena: &Arena) -> RequestSize {
         },
     }
 }
+
+pub struct RequestFrequency {
+    pub common: f64,
+    pub rare: f64,
+    pub epic: f64,
+    pub legendary: f64,
+}
+
+/// The amount of requests to place per week
+pub const REQUEST_FREQUENCY: RequestFrequency = RequestFrequency {
+    common: (6 * 3 + 2) as f64,
+    rare: (6 * 3 + 2) as f64,
+    epic: (1) as f64,
+    legendary: (0) as f64,
+};

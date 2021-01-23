@@ -32,7 +32,7 @@ impl Component for App {
             <br />
             { "Some functionality might not be implemented yet. Please be patient." }
             <br />
-            <em>{ "Reload after adding a card" }</em>
+            <em>{ "Reload after adding a card - changes are not yet supported" }</em>
             </p>
 
             <div style=MY_STYLE>

@@ -96,27 +96,56 @@ impl Component for CardsListing {
 
 impl CardsListing {
     fn view_card(&self, card: &CardEntry) -> Html {
-        html! {
-            <>
+        let data = card.calc_remaining(None);
 
-            // The input fields for new cards
-            <input placeholder="name" value={card.name.to_owned()}/>
-            <input placeholder="need" value={card.need}/>
-            <input placeholder="have" value={card.have}/>
-            <select>
-                { self.get_rarities(Some(&card)) }
-            </select>
+        if let Some(data) = data {
+            // Handle non-legendary cards
+            html! {
+                <>
 
-            // The calculated outputs for the card
-            <p>{"Remaining: "} { cmp::max(card.need - card.have, 0)}</p>
-            <p>{"Requests: "}</p>
-            <p>{"Weeks: "}</p>
-            <p>{"Days: "}</p>
-            <p>{"Days in order: "}</p>
-            <p>{"Done at: "}</p>
-            <p>{"Done in order: "}</p>
+                // The input fields for new cards
+                <input placeholder="name" value={card.name.to_owned()}/>
+                <input placeholder="need" value={card.need}/>
+                <input placeholder="have" value={card.have}/>
+                <select>
+                    { self.get_rarities(Some(&card)) }
+                </select>
 
-            </>
+                // The calculated outputs for the card
+                <p>{"Remaining: "} {data.cards_remaining}</p>
+                <p>{"Requests: "} {data.requests_remaining}</p>
+                <p>{"Weeks: "} {data.weeks_remaining}</p>
+                <p>{"Days: "} {data.days_remaining}</p>
+                <p>{"Days in order: "}</p> // TODO implement days_in_order
+                <p>{"Done at: "}</p> // TODO implement done_at
+                <p>{"Done in order: "}</p> // TODO implement done_in_order_at
+
+                </>
+            }
+        } else {
+            // Handle legendary cards
+            html! {
+                <>
+
+                // The input fields for new cards
+                <input placeholder="name" value={card.name.to_owned()}/>
+                <input placeholder="need" value={card.need}/>
+                <input placeholder="have" value={card.have}/>
+                <select>
+                    { self.get_rarities(Some(&card)) }
+                </select>
+
+                // The calculated outputs for the card
+                <p>{"Remaining: "} { cmp::max(card.need - card.have, 0)}</p>
+                <p>{"Requests: n/a"}</p>
+                <p>{"Weeks: n/a"}</p>
+                <p>{"Days: n/a"}</p>
+                <p>{"Days in order: n/a"}</p>
+                <p>{"Done at: n/a"}</p>
+                <p>{"Done in order: n/a"}</p>
+
+                </>
+            }
         }
     }
 
