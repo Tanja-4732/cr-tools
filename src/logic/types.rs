@@ -103,62 +103,26 @@ pub fn get_donation_size(arena: &Arena) -> DonationSize {
 
 /// Returns the request size limit for a given arena
 pub fn get_request_size(arena: &Arena) -> RequestSize {
-    use RequestSize as Rs;
-
     match arena {
-        Arena::TrainingCamp => Rs { common: 0, rare: 0 },
-        Arena::GoblinStadium => Rs {
+        Arena::TrainingCamp => RequestSize { common: 0, rare: 0 },
+        Arena::GoblinStadium | Arena::BonePit | Arena::BarbarianBowl => RequestSize {
             common: 10,
             rare: 1,
         },
-        Arena::BonePit => Rs {
-            common: 10,
-            rare: 1,
-        },
-        Arena::BarbarianBowl => Rs {
-            common: 10,
-            rare: 1,
-        },
-        Arena::PekkasPlayhouse => Rs {
+        Arena::PekkasPlayhouse | Arena::SpellValley | Arena::BuildersWorkshop => RequestSize {
             common: 20,
             rare: 2,
         },
-        Arena::SpellValley => Rs {
-            common: 20,
-            rare: 2,
-        },
-        Arena::BuildersWorkshop => Rs {
-            common: 20,
-            rare: 2,
-        },
-        Arena::RoyalArena => Rs {
+        Arena::RoyalArena | Arena::FrozenPeak | Arena::JungleArena => RequestSize {
             common: 30,
             rare: 3,
         },
-        Arena::FrozenPeak => Rs {
-            common: 30,
-            rare: 3,
-        },
-        Arena::JungleArena => Rs {
-            common: 30,
-            rare: 3,
-        },
-        Arena::HogMountain => Rs {
-            common: 40,
-            rare: 4,
-        },
-        Arena::ElectroValley => Rs {
-            common: 40,
-            rare: 4,
-        },
-        Arena::SpookyTown => Rs {
-            common: 40,
-            rare: 4,
-        },
-        Arena::LegendaryArena => Rs {
-            common: 40,
-            rare: 4,
-        },
+        Arena::HogMountain | Arena::ElectroValley | Arena::SpookyTown | Arena::LegendaryArena => {
+            RequestSize {
+                common: 40,
+                rare: 4,
+            }
+        }
     }
 }
 
