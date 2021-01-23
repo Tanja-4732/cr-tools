@@ -105,20 +105,21 @@ impl CardsListing {
 
                 // The input fields for new cards
                 <input placeholder="name" value={card.name.to_owned()}/>
-                <input placeholder="need" value={card.need}/>
+                <input placeholder="level" value={card.level}/>
                 <input placeholder="have" value={card.have}/>
                 <select>
                     { self.get_rarities(Some(&card)) }
                 </select>
 
                 // The calculated outputs for the card
-                <p>{"Remaining: "} {data.cards_remaining}</p>
-                <p>{"Requests: "} {data.requests_remaining}</p>
-                <p>{"Weeks: "} {data.weeks_remaining}</p>
-                <p>{"Days: "} {data.days_remaining}</p>
-                <p>{"Days in order: "}</p> // TODO implement days_in_order
-                <p>{"Done at: "}</p> // TODO implement done_at
-                <p>{"Done in order: "}</p> // TODO implement done_in_order_at
+                <span>{"Need: "} {card.get_needed()}</span>
+                <span>{"Remaining: "} {data.cards_remaining}</span>
+                <span>{"Requests: "} {data.requests_remaining}</span>
+                <span>{"Weeks: "} {data.weeks_remaining}</span>
+                <span>{"Days: "} {data.days_remaining}</span>
+                <span>{"Days in order: "}</span> // TODO implement days_in_order
+                <span>{"Done at: "}</span> // TODO implement done_at
+                <span>{"Done in order: "}</span> // TODO implement done_in_order_at
 
                 </>
             }
@@ -129,20 +130,21 @@ impl CardsListing {
 
                 // The input fields for new cards
                 <input placeholder="name" value={card.name.to_owned()}/>
-                <input placeholder="need" value={card.need}/>
+                <input placeholder="level" value={card.level}/>
                 <input placeholder="have" value={card.have}/>
                 <select>
                     { self.get_rarities(Some(&card)) }
                 </select>
 
                 // The calculated outputs for the card
-                <p>{"Remaining: "} { cmp::max(card.need - card.have, 0)}</p>
-                <p>{"Requests: n/a"}</p>
-                <p>{"Weeks: n/a"}</p>
-                <p>{"Days: n/a"}</p>
-                <p>{"Days in order: n/a"}</p>
-                <p>{"Done at: n/a"}</p>
-                <p>{"Done in order: n/a"}</p>
+                <span>{"Need: "} {card.get_needed()}</span>
+                <span>{"Remaining: "} { cmp::max(card.get_needed() - card.have, 0)}</span>
+                <span>{"Requests: n/a"}</span>
+                <span>{"Weeks: n/a"}</span>
+                <span>{"Days: n/a"}</span>
+                <span>{"Days in order: n/a"}</span>
+                <span>{"Done at: n/a"}</span>
+                <span>{"Done in order: n/a"}</span>
 
                 </>
             }

@@ -32,7 +32,7 @@ pub struct CardInput {
 pub enum Msg {
     Create,
     UpdateName(String),
-    UpdateNeed(usize),
+    UpdateLevel(usize),
     UpdateHave(usize),
     UpdateRarity(Rarity),
     NoOp,
@@ -67,7 +67,7 @@ impl Component for CardInput {
             card: CardEntry {
                 name: String::new(),
                 have: 0,
-                need: 0,
+                level: 9,
                 card_type: CardType::Building,
                 rarity: Rarity::Common,
             },
@@ -78,7 +78,7 @@ impl Component for CardInput {
         match msg {
             Msg::NoOp => {}
             Msg::UpdateName(name) => self.card.name = name,
-            Msg::UpdateNeed(need) => self.card.need = need,
+            Msg::UpdateLevel(level) => self.card.level = level,
             Msg::UpdateHave(have) => self.card.have = have,
             Msg::UpdateRarity(rarity) => self.card.rarity = rarity,
             Msg::Create => {
@@ -104,7 +104,7 @@ impl Component for CardInput {
 
                 // The input fields for new cards
                 <input placeholder="name" oninput=self.link.callback(|i: InputData| Msg::UpdateName(i.value)) />
-                <input placeholder="need" oninput=self.link.callback(|i: InputData| Msg::UpdateNeed(i.value.parse::<usize>().unwrap())) />
+                <input placeholder="level" oninput=self.link.callback(|i: InputData| Msg::UpdateLevel(i.value.parse::<usize>().unwrap())) />
                 <input placeholder="have" oninput=self.link.callback(|i: InputData| Msg::UpdateHave(i.value.parse::<usize>().unwrap())) />
                 <select onchange=self.link.callback(|i: ChangeData| {
                     if let yew::events::ChangeData::Select(data) = i {

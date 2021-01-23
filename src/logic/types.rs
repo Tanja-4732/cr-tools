@@ -9,8 +9,8 @@ pub struct CardEntry {
     /// The amount of cards in posession
     pub have: usize,
 
-    /// The amount of cards required to upgrade
-    pub need: usize,
+    /// The current level of the card
+    pub level: usize,
 
     /// The rarity of the card
     pub card_type: CardType,
@@ -133,10 +133,47 @@ pub struct RequestFrequency {
     pub legendary: f64,
 }
 
-/// The amount of requests to place per week
+/**
+The amount of requests to place per week
+
+- Each day can fit three requests
+- Epic cards can (and get) only be requested once per week
+- Common or rare cards get requested otherwise
+*/
 pub const REQUEST_FREQUENCY: RequestFrequency = RequestFrequency {
     common: (6 * 3 + 2) as f64,
     rare: (6 * 3 + 2) as f64,
     epic: (1) as f64,
     legendary: (0) as f64,
 };
+
+const NEEDED_CARDS: [usize; 13] = [1, 2, 4, 10, 20, 50, 100, 200, 400, 800, 1000, 2000, 5000];
+
+const COMMON_OFFSET: usize = 0;
+const RARE_OFFSET: usize = 2;
+const EPIC_OFFSET: usize = 5;
+const LEGENDARY_OFFSET: usize = 8;
+
+impl CardEntry {
+    /// Calculates the amount of required cards to upgrade to the next level (or 0 when on 13)
+    pub fn get_needed(&self) -> usize {
+        if self.level == 13 {
+            return 0;
+        };
+
+        let level_clip = |level: usize| {
+            if level < 1 {
+                panic!("Invalid level")
+            } else {
+                level
+            }
+        };
+
+        match self.rarity {
+            Rarity::Common => NEEDED_CARDS[level_clip(self.level - COMMON_OFFSET)],
+            Rarity::Rare => NEEDED_CARDS[level_clip(self.level - RARE_OFFSET)],
+            Rarity::Epic => NEEDED_CARDS[level_clip(self.level - EPIC_OFFSET)],
+            Rarity::Legendary => NEEDED_CARDS[level_clip(self.level - LEGENDARY_OFFSET)],
+        }
+    }
+}
