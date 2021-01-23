@@ -1,22 +1,11 @@
 use crate::logic::types::{CardEntry, CardType, Rarity};
-use std::cmp;
-use std::iter::Filter;
-
-use super::card_info::CardInfo;
-use yew::prelude::*;
-
-use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
 use strum::IntoEnumIterator;
-use strum_macros::{EnumIter, ToString};
-use wasm_bindgen::prelude::*;
 use yew::events::ChangeData;
-use yew::events::KeyboardEvent;
 use yew::format::Json;
+use yew::prelude::*;
 use yew::services::storage::{Area, StorageService};
-use yew::web_sys::console;
-use yew::web_sys::HtmlInputElement as InputElement;
-use yew::{html, Component, ComponentLink, Href, Html, InputData, NodeRef, ShouldRender};
+use yew::{html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
 
 const KEY: &str = "cr-tools.state.cards";
 
@@ -70,6 +59,7 @@ impl Component for CardInput {
                 level: 9,
                 card_type: CardType::Building,
                 rarity: Rarity::Common,
+                computed: None,
             },
         }
     }
@@ -103,9 +93,9 @@ impl Component for CardInput {
             <>
 
                 // The input fields for new cards
-                <input placeholder="name" oninput=self.link.callback(|i: InputData| Msg::UpdateName(i.value)) />
-                <input placeholder="level" oninput=self.link.callback(|i: InputData| Msg::UpdateLevel(i.value.parse::<usize>().unwrap())) />
-                <input placeholder="have" oninput=self.link.callback(|i: InputData| Msg::UpdateHave(i.value.parse::<usize>().unwrap())) />
+                <input type="text" placeholder="name" oninput=self.link.callback(|i: InputData| Msg::UpdateName(i.value)) />
+                <input type="number" placeholder="level" oninput=self.link.callback(|i: InputData| Msg::UpdateLevel(i.value.parse::<usize>().unwrap())) />
+                <input type="number" placeholder="have" oninput=self.link.callback(|i: InputData| Msg::UpdateHave(i.value.parse::<usize>().unwrap())) />
                 <select onchange=self.link.callback(|i: ChangeData| {
                     if let yew::events::ChangeData::Select(data) = i {
                         Msg::UpdateRarity(Rarity::from_str(&data.value()).unwrap())

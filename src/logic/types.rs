@@ -1,6 +1,8 @@
 use serde_derive::{Deserialize, Serialize};
 use strum_macros::{EnumIter, EnumString};
 
+use super::calc::CardData;
+
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct CardEntry {
     /// The name of the card
@@ -17,6 +19,10 @@ pub struct CardEntry {
 
     /// The rarity of the card
     pub rarity: Rarity,
+
+    /// Computed values
+    #[serde(skip)]
+    pub computed: Option<CardData>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]

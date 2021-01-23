@@ -47,6 +47,6 @@ impl Component for App {
 
 const MY_STYLE: &str = "
     display: grid;
-    grid-template-columns: repeat(12, auto);
+    grid-template-columns: auto 4em 4em repeat(9, auto);
     gap: 5px;
 ";

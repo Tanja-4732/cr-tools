@@ -48,7 +48,7 @@ impl Component for CardsListing {
         let storage = StorageService::new(Area::Local).expect("Cannot use localStorage");
 
         // Load the cards from localStorage
-        let cards = {
+        let mut cards = {
             if let Json(Ok(loaded_cards)) = storage.restore(KEY) {
                 loaded_cards
             } else {
@@ -56,6 +56,12 @@ impl Component for CardsListing {
                 Vec::new()
             }
         };
+
+        // Compute the calculated values of all cards
+        CardEntry::compute_all(&mut cards);
+
+        // Sort by remaining time
+        cards.sort_by(CardEntry::sort_remaining);
 
         let state = State {
             cards,
@@ -96,7 +102,7 @@ impl Component for CardsListing {
 
 impl CardsListing {
     fn view_card(&self, card: &CardEntry) -> Html {
-        let data = card.calc_remaining(None);
+        let data = &card.computed;
 
         if let Some(data) = data {
             // Handle non-legendary cards
@@ -104,9 +110,9 @@ impl CardsListing {
                 <>
 
                 // The input fields for new cards
-                <input placeholder="name" value={card.name.to_owned()}/>
-                <input placeholder="level" value={card.level}/>
-                <input placeholder="have" value={card.have}/>
+                <input type="text" placeholder="name" value={card.name.to_owned()}/>
+                <input type="number" placeholder="level" value={card.level}/>
+                <input type="number" placeholder="have" value={card.have}/>
                 <select>
                     { self.get_rarities(Some(&card)) }
                 </select>
@@ -129,9 +135,9 @@ impl CardsListing {
                 <>
 
                 // The input fields for new cards
-                <input placeholder="name" value={card.name.to_owned()}/>
-                <input placeholder="level" value={card.level}/>
-                <input placeholder="have" value={card.have}/>
+                <input type="text" placeholder="name" value={card.name.to_owned()}/>
+                <input type="number" placeholder="level" value={card.level}/>
+                <input type="number" placeholder="have" value={card.have}/>
                 <select>
                     { self.get_rarities(Some(&card)) }
                 </select>

@@ -1,16 +1,18 @@
-use std::cmp;
-
 use super::types::{get_request_size, Arena, CardEntry, Rarity, REQUEST_FREQUENCY};
+use chrono::{DateTime, Duration, Local};
+use serde_derive::{Deserialize, Serialize};
+use std::cmp;
+use strum_macros::{EnumIter, EnumString};
 
+#[derive(PartialEq, Clone)]
 pub struct CardData {
     pub cards_remaining: usize,
     pub requests_remaining: usize,
     pub weeks_remaining: f64,
     pub days_remaining: f64,
-    // TODO implement the "in order" fields
-    // pub days_in_order: usize,
-    // pub done_at: Date,
-    // pub done_in_order_at: Date,
+    pub done_on: DateTime<Local>,
+    pub days_in_order: Option<f64>,
+    pub done_in_order_on: Option<DateTime<Local>>,
 }
 
 impl CardEntry {
@@ -41,11 +43,50 @@ impl CardEntry {
                 Rarity::Legendary => REQUEST_FREQUENCY.legendary, // Unreachable
             } as f64;
 
+        let days_remaining = weeks_remaining * 7 as f64;
+
+        let done_on =
+            Local::now().checked_add_signed(Duration::days(days_remaining.ceil() as i64))?;
+
         Some(CardData {
             cards_remaining,
             requests_remaining,
             weeks_remaining,
-            days_remaining: weeks_remaining * 7 as f64,
+            days_remaining,
+            done_on,
+            days_in_order: None,
+            done_in_order_on: None,
         })
+    }
+
+    pub fn compute_all(list: &mut Vec<Self>) {
+        for card in list {
+            card.computed = card.calc_remaining(None);
+        }
+    }
+
+    /// Custom order algorithm for sorting CardEntries by days
+    pub fn sort_remaining(a: &Self, b: &Self) -> cmp::Ordering {
+        // Handle legendary cards
+        if a.rarity == Rarity::Legendary {
+            if b.rarity == Rarity::Legendary {
+                return cmp::Ordering::Equal;
+            } else {
+                return cmp::Ordering::Greater;
+            }
+        }
+        if b.rarity == Rarity::Legendary {
+            return cmp::Ordering::Less;
+        }
+
+        let get_remaining = |card: &CardEntry| {
+            card.computed
+                .clone()
+                .unwrap_or_else(|| card.calc_remaining(None).unwrap())
+                .days_remaining
+        };
+
+        // Compare the cards
+        get_remaining(a).partial_cmp(&get_remaining(b)).unwrap()
     }
 }
