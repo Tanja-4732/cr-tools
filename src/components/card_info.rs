@@ -10,7 +10,6 @@ use wasm_bindgen::prelude::*;
 use yew::events::KeyboardEvent;
 use yew::format::Json;
 use yew::prelude::*;
-use yew::services::storage::{Area, StorageService};
 use yew::web_sys::HtmlInputElement as InputElement;
 use yew::{html, Component, ComponentLink, Href, Html, InputData, NodeRef, ShouldRender};
 
@@ -21,6 +20,7 @@ pub struct CardInfo {
 }
 
 pub enum Msg {}
+
 #[derive(Properties, Clone)]
 pub struct Props {
     pub card: CardEntry,
@@ -39,7 +39,7 @@ impl Component for CardInfo {
     }
 
     fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        false
+        true
     }
 
     fn view(&self) -> Html {

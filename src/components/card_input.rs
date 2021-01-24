@@ -1,21 +1,13 @@
-use crate::logic::types::{CardEntry, CardType, Rarity};
+use crate::logic::types::{CardEntry, Rarity};
 use std::str::FromStr;
 use strum::IntoEnumIterator;
-use yew::events::ChangeData;
-use yew::format::Json;
 use yew::prelude::*;
-use yew::services::storage::{Area, StorageService};
-use yew::{html, Component, ComponentLink, Html, InputData, NodeRef, ShouldRender};
-
-const KEY: &str = "cr-tools.state.cards";
 
 /// Enter information about a card
 pub struct CardInput {
     link: ComponentLink<Self>,
-    focus_ref: NodeRef,
-    cards: Vec<CardEntry>,
     card: CardEntry,
-    storage: StorageService,
+    props: Props,
 }
 
 pub enum Msg {
@@ -24,68 +16,49 @@ pub enum Msg {
     UpdateLevel(usize),
     UpdateHave(usize),
     UpdateRarity(Rarity),
-    NoOp,
+}
+
+#[derive(Properties, Clone)]
+pub struct Props {
+    pub on_create: Callback<CardEntry>,
 }
 
 impl Component for CardInput {
     type Message = Msg;
-    type Properties = ();
+    type Properties = Props;
 
-    fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        // Get a reference to localStorage
-        let storage = StorageService::new(Area::Local).expect("Cannot use localStorage");
-
-        // Load the cards from localStorage
-        let cards = {
-            if let Json(Ok(loaded_cards)) = storage.restore(KEY) {
-                loaded_cards
-            } else {
-                // If no such entry exists, create a new one
-                Vec::new()
-            }
-        };
-
-        // TODO maybe remove
-        let focus_ref = NodeRef::default();
-
+    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
+            props,
             link,
-            focus_ref,
-            cards,
-            storage,
-            card: CardEntry {
-                name: String::new(),
-                have: 0,
-                level: 9,
-                card_type: CardType::Building,
-                rarity: Rarity::Common,
-                computed: None,
-            },
+            card: CardEntry::new(),
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::NoOp => {}
             Msg::UpdateName(name) => self.card.name = name,
             Msg::UpdateLevel(level) => self.card.level = level,
             Msg::UpdateHave(have) => self.card.have = have,
             Msg::UpdateRarity(rarity) => self.card.rarity = rarity,
             Msg::Create => {
-                // Push the card onto the list
-                self.cards.push(self.card.clone());
+                // Give the new card to the listing component
+                self.props.on_create.emit(self.card.clone());
 
-                // Persist the data
-                self.storage.store(KEY, Json(&self.cards));
+                // Reset this component
+                self.card = CardEntry::new();
+
+                // Re-render
+                return true;
             }
         }
 
-        // Re-render
-        true
+        // Don't re-render
+        false
     }
 
     fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        false
+        true
     }
 
     fn view(&self) -> Html {

@@ -25,6 +25,19 @@ pub struct CardEntry {
     pub computed: Option<CardData>,
 }
 
+impl CardEntry {
+    pub fn new() -> Self {
+        Self {
+            name: String::new(),
+            have: 0,
+            level: 9,
+            card_type: CardType::Building,
+            rarity: Rarity::Common,
+            computed: None,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub enum CardType {
     Troop,

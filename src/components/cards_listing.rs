@@ -22,21 +22,17 @@ pub struct CardsListing {
     link: ComponentLink<Self>,
     storage: StorageService,
     state: State,
-    focus_ref: NodeRef,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct State {
     cards: Vec<CardEntry>,
-    value: String,
-    edit_value: String,
 }
 
 pub enum Msg {
-    Create(MouseEvent),
+    Create(CardEntry),
     Update,
     Delete,
-    NoOp,
 }
 
 impl Component for CardsListing {
@@ -66,24 +62,38 @@ impl Component for CardsListing {
         // Compute the in_order values
         CardEntry::sum_all(&mut cards).unwrap();
 
-        let state = State {
-            cards,
-            value: "".into(),
-            edit_value: "".into(),
-        };
-
-        // TODO maybe remove
-        let focus_ref = NodeRef::default();
+        let state = State { cards };
 
         Self {
             link,
             storage,
             state,
-            focus_ref,
         }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        match msg {
+            Msg::Create(mut card) => {
+                // Generate the computed values of the card
+                card.computed = card.calc_remaining(None);
+
+                // Add the card to the list
+                self.state.cards.push(card);
+
+                // Sort by remaining time
+                // TODO uncomment this:
+                // self.state.cards.sort_by(CardEntry::sort_remaining);
+
+                // Compute the in_order values
+                CardEntry::sum_all(&mut self.state.cards).unwrap();
+
+                // Persist the data
+                self.storage.store(KEY, Json(&self.state.cards));
+            }
+            Msg::Update => {}
+            Msg::Delete => {}
+        }
+
         true
     }
 
@@ -103,7 +113,7 @@ impl Component for CardsListing {
                 }
 
                 // Show a field for card input
-                <CardInput />
+                <CardInput on_create=self.link.callback(|card: CardEntry| Msg::Create(card)) />
 
 
            </div>
