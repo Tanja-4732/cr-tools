@@ -37,3 +37,4 @@ serde_derive = "1"
 chrono = { version = "0.4", features = ["wasmbind"] }
 anyhow = "1.0.38"
 thiserror = "1.0.23"
+float-pretty-print = "0.1.0"

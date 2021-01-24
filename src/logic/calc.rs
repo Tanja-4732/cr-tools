@@ -109,6 +109,12 @@ impl CardEntry {
             if let Some(data) = &mut card.computed {
                 let current_time = data.days_remaining + prev_time;
 
+                data.done_in_order_on = Some(
+                    Local::now()
+                        .checked_add_signed(Duration::days(current_time.ceil() as i64))
+                        .ok_or(MyError::MissingCalculatedValues)?,
+                );
+
                 data.days_in_order = Some(current_time);
                 prev_time = current_time;
             } else {

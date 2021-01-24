@@ -101,6 +101,7 @@ version = "0.3.0"
 dependencies = [
  "anyhow",
  "chrono",
+ "float-pretty-print",
  "serde",
  "serde_derive",
  "strum",
@@ -109,6 +110,12 @@ dependencies = [
  "wasm-bindgen",
  "yew",
 ]
+
+[[package]]
+name = "float-pretty-print"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5251eae93541dccf57e6f7e5590a76a652eb4e4ddd44f851a32162e1bb203e81"
 
 [[package]]
 name = "fnv"

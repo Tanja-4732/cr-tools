@@ -1,16 +1,16 @@
+use super::card_info::CardInfo;
 use crate::logic::types::{CardEntry, CardType, Rarity};
+use chrono::{DateTime, Local};
+use float_pretty_print::PrettyPrintFloat;
+use serde_derive::{Deserialize, Serialize};
 use std::cmp;
 use std::iter::Filter;
-
-use super::card_info::CardInfo;
-use yew::prelude::*;
-
-use serde_derive::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::{EnumIter, ToString};
 use wasm_bindgen::prelude::*;
 use yew::events::KeyboardEvent;
 use yew::format::Json;
+use yew::prelude::*;
 use yew::services::storage::{Area, StorageService};
 use yew::web_sys::HtmlInputElement as InputElement;
 use yew::{html, Component, ComponentLink, Href, Html, InputData, NodeRef, ShouldRender};
@@ -104,10 +104,16 @@ impl Component for CardsListing {
 }
 
 impl CardsListing {
+    fn simple_round(number: f64) -> String {
+        format!("{:.3}", PrettyPrintFloat(number))
+    }
+
     fn view_card(&self, card: &CardEntry) -> Html {
         let data = &card.computed;
 
         if let Some(data) = data {
+            let get_date = |date: DateTime<Local>| date.date().format("%F");
+
             // Handle non-legendary cards
             html! {
                 <>
@@ -124,11 +130,11 @@ impl CardsListing {
                 <span>{"Need: "} {card.get_needed()}</span>
                 <span>{"Remaining: "} {data.cards_remaining}</span>
                 <span>{"Requests: "} {data.requests_remaining}</span>
-                <span>{"Weeks: "} {data.weeks_remaining}</span>
-                <span>{"Days: "} {data.days_remaining}</span>
-                <span>{"Days in order: "} {data.days_in_order.unwrap()}</span> // TODO implement days_in_order
-                <span>{"Done at: "}</span> // TODO implement done_at
-                <span>{"Done in order: "}</span> // TODO implement done_in_order_at
+                <span>{"Weeks: "} {Self::simple_round(data.weeks_remaining.clone())}</span>
+                <span>{"Days: "} {Self::simple_round(data.days_remaining.clone())}</span>
+                <span>{"Days in order: "} {Self::simple_round(data.days_in_order.unwrap().clone())}</span>
+                <span>{"Done on: "} {get_date(data.done_on)}</span>
+                <span>{"Done in order: "} {get_date(data.done_in_order_on.unwrap())}</span>
 
                 </>
             }
@@ -159,7 +165,7 @@ impl CardsListing {
                 <span>{"Weeks: n/a"}</span>
                 <span>{"Days: n/a"}</span>
                 <span>{"Days in order: n/a"}</span>
-                <span>{"Done at: n/a"}</span>
+                <span>{"Done on: n/a"}</span>
                 <span>{"Done in order: n/a"}</span>
 
                 </>
