@@ -27,12 +27,14 @@ pub struct CardsListing {
 #[derive(Serialize, Deserialize)]
 pub struct State {
     cards: Vec<CardEntry>,
+    real_pass: bool,
 }
 
 pub enum Msg {
     Create(CardEntry),
     Update,
     Delete,
+    RealPass,
 }
 
 impl Component for CardsListing {
@@ -62,7 +64,10 @@ impl Component for CardsListing {
         // Compute the in_order values
         CardEntry::sum_all(&mut cards).unwrap();
 
-        let state = State { cards };
+        let state = State {
+            cards,
+            real_pass: true,
+        };
 
         Self {
             link,
@@ -81,17 +86,20 @@ impl Component for CardsListing {
                 self.state.cards.push(card);
 
                 // Sort by remaining time
-                // TODO uncomment this:
-                // self.state.cards.sort_by(CardEntry::sort_remaining);
+                self.state.cards.sort_by(CardEntry::sort_remaining);
 
                 // Compute the in_order values
                 CardEntry::sum_all(&mut self.state.cards).unwrap();
 
                 // Persist the data
                 self.storage.store(KEY, Json(&self.state.cards));
+
+                // Do a fake render first
+                self.state.real_pass = false;
             }
             Msg::Update => {}
             Msg::Delete => {}
+            Msg::RealPass => self.state.real_pass = true,
         }
 
         true
@@ -102,21 +110,25 @@ impl Component for CardsListing {
     }
 
     fn view(&self) -> Html {
-        html! {
-            <div style=MY_STYLE>
+        if self.state.real_pass {
+            html! {
+                <div style=MY_STYLE>
 
-                // Render all cards
-                {
-                    for self.state.cards.iter().map(|c| html!{
-                        <CardInfo card=c/>
-                    })
-                }
+                    // Render all cards
+                    {
+                        for self.state.cards.iter().map(|c| html!{
+                            <CardInfo card=c.clone()/>
+                        })
+                    }
 
-                // Show a field for card input
-                <CardInput on_create=self.link.callback(|card: CardEntry| Msg::Create(card)) />
+                    // Show a field for card input
+                    <CardInput on_create=self.link.callback(|card: CardEntry| Msg::Create(card)) />
 
-
-           </div>
+               </div>
+            }
+        } else {
+            // Force a legit re-render (avoids memoization)
+            html! { <img src="" onerror=self.link.callback(|_| Msg::RealPass) />}
         }
     }
 }
