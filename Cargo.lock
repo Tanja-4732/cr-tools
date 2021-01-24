@@ -99,11 +99,13 @@ dependencies = [
 name = "cr-tools"
 version = "0.2.0"
 dependencies = [
+ "anyhow",
  "chrono",
  "serde",
  "serde_derive",
  "strum",
  "strum_macros",
+ "thiserror",
  "wasm-bindgen",
  "yew",
 ]

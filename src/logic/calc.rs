@@ -1,8 +1,16 @@
 use super::types::{get_request_size, Arena, CardEntry, Rarity, REQUEST_FREQUENCY};
+use anyhow::{bail, Result};
 use chrono::{DateTime, Duration, Local};
 use serde_derive::{Deserialize, Serialize};
 use std::cmp;
 use strum_macros::{EnumIter, EnumString};
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+enum MyError {
+    #[error("One or more cards have missing values")]
+    MissingCalculatedValues,
+}
 
 #[derive(PartialEq, Clone)]
 pub struct CardData {
@@ -92,5 +100,22 @@ impl CardEntry {
 
         // Compare the cards
         get_remaining(a).partial_cmp(&get_remaining(b)).unwrap()
+    }
+
+    pub fn sum_all(list: &mut Vec<Self>) -> Result<()> {
+        let mut prev_time = 0.;
+
+        for card in list {
+            if let Some(data) = &mut card.computed {
+                let current_time = data.days_remaining + prev_time;
+
+                data.days_in_order = Some(current_time);
+                prev_time = current_time;
+            } else {
+                bail!(MyError::MissingCalculatedValues);
+            }
+        }
+
+        Ok(())
     }
 }

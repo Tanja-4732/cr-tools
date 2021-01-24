@@ -63,6 +63,9 @@ impl Component for CardsListing {
         // Sort by remaining time
         cards.sort_by(CardEntry::sort_remaining);
 
+        // Compute the in_order values
+        CardEntry::sum_all(&mut cards).unwrap_throw();
+
         let state = State {
             cards,
             value: "".into(),
@@ -123,7 +126,7 @@ impl CardsListing {
                 <span>{"Requests: "} {data.requests_remaining}</span>
                 <span>{"Weeks: "} {data.weeks_remaining}</span>
                 <span>{"Days: "} {data.days_remaining}</span>
-                <span>{"Days in order: "}</span> // TODO implement days_in_order
+                <span>{"Days in order: "} {data.days_in_order.unwrap()}</span> // TODO implement days_in_order
                 <span>{"Done at: "}</span> // TODO implement done_at
                 <span>{"Done in order: "}</span> // TODO implement done_in_order_at
 
