@@ -1,4 +1,4 @@
-use super::card_info::CardInfo;
+use super::{card_info::CardInfo, card_input::CardInput};
 use crate::logic::types::{CardEntry, CardType, Rarity};
 use chrono::{DateTime, Local};
 use float_pretty_print::PrettyPrintFloat;
@@ -88,106 +88,31 @@ impl Component for CardsListing {
     }
 
     fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        false
+        true
     }
 
     fn view(&self) -> Html {
         html! {
-            <>
+            <div style=MY_STYLE>
 
-                 // Render all cards
-                { for self.state.cards.iter().map(|card| self.view_card(card)) }
+                // Render all cards
+                {
+                    for self.state.cards.iter().map(|c| html!{
+                        <CardInfo card=c/>
+                    })
+                }
 
-            </>
+                // Show a field for card input
+                <CardInput />
+
+
+           </div>
         }
     }
 }
 
-impl CardsListing {
-    fn simple_round(number: f64) -> String {
-        format!("{:.3}", PrettyPrintFloat(number))
-    }
-
-    fn view_card(&self, card: &CardEntry) -> Html {
-        let data = &card.computed;
-
-        if let Some(data) = data {
-            let get_date = |date: DateTime<Local>| date.date().format("%F");
-
-            // Handle non-legendary cards
-            html! {
-                <>
-
-                // The input fields for new cards
-                <input type="text" placeholder="name" value={card.name.to_owned()}/>
-                <input type="number" placeholder="level" value={card.level}/>
-                <input type="number" placeholder="have" value={card.have}/>
-                <select>
-                    { self.get_rarities(Some(&card)) }
-                </select>
-
-                // The calculated outputs for the card
-                <span>{"Need: "} {card.get_needed()}</span>
-                <span>{"Remaining: "} {data.cards_remaining}</span>
-                <span>{"Requests: "} {data.requests_remaining}</span>
-                <span>{"Weeks: "} {Self::simple_round(data.weeks_remaining.clone())}</span>
-                <span>{"Days: "} {Self::simple_round(data.days_remaining.clone())}</span>
-                <span>{"Days in order: "} {Self::simple_round(data.days_in_order.unwrap().clone())}</span>
-                <span>{"Done on: "} {get_date(data.done_on)}</span>
-                <span>{"Done in order: "} {get_date(data.done_in_order_on.unwrap())}</span>
-
-                </>
-            }
-        } else {
-            // Handle legendary cards
-
-            let cards_remaining = if card.get_needed() < card.have {
-                0
-            } else {
-                card.get_needed() - card.have
-            };
-
-            html! {
-                <>
-
-                // The input fields for new cards
-                <input type="text" placeholder="name" value={card.name.to_owned()}/>
-                <input type="number" placeholder="level" value={card.level}/>
-                <input type="number" placeholder="have" value={card.have}/>
-                <select>
-                    { self.get_rarities(Some(&card)) }
-                </select>
-
-                // The calculated outputs for the card
-                <span>{"Need: "} {card.get_needed()}</span>
-                <span>{"Remaining: "} { cards_remaining }</span>
-                <span>{"Requests: n/a"}</span>
-                <span>{"Weeks: n/a"}</span>
-                <span>{"Days: n/a"}</span>
-                <span>{"Days in order: n/a"}</span>
-                <span>{"Done on: n/a"}</span>
-                <span>{"Done in order: n/a"}</span>
-
-                </>
-            }
-        }
-    }
-
-    fn get_rarities(&self, card: Option<&CardEntry>) -> Html {
-        // TODO cache/memoize this
-
-        Rarity::iter()
-            .map(|rarity| {
-                let name = format!("{:?}", rarity);
-
-                let should_select = if let Some(c) = card {
-                    c.rarity == rarity
-                } else {
-                    false
-                };
-
-                html! {<option value=name selected={should_select}> {name} </option>}
-            })
-            .collect::<Html>()
-    }
-}
+const MY_STYLE: &str = "
+    display: grid;
+    grid-template-columns: auto 4em 4em repeat(9, auto);
+    gap: 5px;
+";

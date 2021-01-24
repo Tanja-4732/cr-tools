@@ -1,13 +1,11 @@
-use super::{card_info::CardInfo, card_input::CardInput, cards_listing::CardsListing};
+use super::cards_listing::CardsListing;
 use yew::prelude::*;
 
 /// The root component of cr-tools
-pub struct App {}
-
-pub enum Msg {}
+pub struct App;
 
 impl Component for App {
-    type Message = Msg;
+    type Message = ();
     type Properties = ();
 
     fn create(_: Self::Properties, _: ComponentLink<Self>) -> Self {
@@ -35,18 +33,9 @@ impl Component for App {
             <em>{ "Reload after adding a card - changes are not yet supported" }</em>
             </p>
 
-            <div style=MY_STYLE>
-                <CardsListing />
-                <CardInput />
-            </div>
+            <CardsListing />
 
             </>
         }
     }
 }
-
-const MY_STYLE: &str = "
-    display: grid;
-    grid-template-columns: auto 4em 4em repeat(9, auto);
-    gap: 5px;
-";
