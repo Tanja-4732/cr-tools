@@ -103,11 +103,22 @@ impl CardEntry {
     }
 
     pub fn sum_all(list: &mut Vec<Self>) -> Result<()> {
-        let mut prev_time = 0.;
+        let mut prev_time_regular = 0.;
+        let mut prev_time_epic = 0.;
 
         for card in list {
+            // Handle cards according to their respective rarities
+            let prev_time = match card.rarity {
+                Rarity::Common | Rarity::Rare => &mut prev_time_regular,
+                Rarity::Epic => &mut prev_time_epic,
+                Rarity::Legendary => {
+                    // Skip legendary cards
+                    continue;
+                }
+            };
+
             if let Some(data) = &mut card.computed {
-                let current_time = data.days_remaining + prev_time;
+                let current_time = data.days_remaining + *prev_time;
 
                 data.done_in_order_on = Some(
                     Local::now()
@@ -116,7 +127,7 @@ impl CardEntry {
                 );
 
                 data.days_in_order = Some(current_time);
-                prev_time = current_time;
+                *prev_time = current_time;
             } else {
                 bail!(MyError::MissingCalculatedValues);
             }

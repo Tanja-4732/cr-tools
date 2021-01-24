@@ -64,7 +64,7 @@ impl Component for CardsListing {
         cards.sort_by(CardEntry::sort_remaining);
 
         // Compute the in_order values
-        CardEntry::sum_all(&mut cards).unwrap_throw();
+        CardEntry::sum_all(&mut cards).unwrap();
 
         let state = State {
             cards,
