@@ -1,9 +1,7 @@
 use super::types::{get_request_size, Arena, CardEntry, Rarity, REQUEST_FREQUENCY};
 use anyhow::{bail, Result};
 use chrono::{DateTime, Duration, Local};
-use serde_derive::{Deserialize, Serialize};
 use std::cmp;
-use strum_macros::{EnumIter, EnumString};
 use thiserror::Error;
 
 #[derive(Error, Debug)]

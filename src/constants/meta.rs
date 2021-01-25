@@ -1,3 +1,6 @@
+// Not every constant is used
+#![allow(dead_code)]
+
 // The name of the application
 pub const NAME: &'static str = "cr-tools";
 

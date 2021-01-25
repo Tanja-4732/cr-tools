@@ -6,7 +6,6 @@ pub mod logic;
 // For use in the web app only
 pub(crate) mod components;
 pub(crate) mod constants;
-pub(crate) mod services;
 
 use components::app;
 use wasm_bindgen::prelude::*;

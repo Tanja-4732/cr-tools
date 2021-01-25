@@ -1,18 +1,9 @@
-use crate::logic::types::{CardEntry, CardType, Rarity};
+use crate::logic::types::{CardEntry, Rarity};
 use chrono::{DateTime, Local};
 use float_pretty_print::PrettyPrintFloat;
-use serde_derive::{Deserialize, Serialize};
-use std::cmp;
-use std::iter::Filter;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
-use strum_macros::{EnumIter, ToString};
-use wasm_bindgen::prelude::*;
-use yew::events::KeyboardEvent;
-use yew::format::Json;
 use yew::prelude::*;
-use yew::web_sys::HtmlInputElement as InputElement;
-use yew::{html, Component, ComponentLink, Href, Html, InputData, NodeRef, ShouldRender};
 
 /// The root component of cr-tools
 pub struct CardInfo {
