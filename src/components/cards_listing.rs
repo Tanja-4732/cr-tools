@@ -1,11 +1,14 @@
 use super::{card_info::CardInfo, card_input::CardInput};
-use crate::logic::types::CardEntry;
+use crate::logic::types::{Arena, CardEntry};
 use serde_derive::{Deserialize, Serialize};
+use std::str::FromStr;
+use strum::IntoEnumIterator;
 use yew::format::Json;
 use yew::prelude::*;
 use yew::services::storage::{Area, StorageService};
 
-const KEY: &str = "cr-tools.state.cards";
+const CARDS_KEY: &str = "cr-tools.state.cards";
+const ARENA_KEY: &str = "cr-tools.state.arena";
 
 /// The listing of the cards to keep track of
 pub struct CardsListing {
@@ -18,6 +21,7 @@ pub struct CardsListing {
 pub struct State {
     cards: Vec<CardEntry>,
     real_pass: bool,
+    arena: Arena,
 }
 
 pub enum Msg {
@@ -25,6 +29,7 @@ pub enum Msg {
     Update(usize, CardEntry),
     Delete(usize),
     RealPass,
+    SetArena(Arena),
 }
 
 impl Component for CardsListing {
@@ -37,7 +42,7 @@ impl Component for CardsListing {
 
         // Load the cards from localStorage
         let mut cards = {
-            if let Json(Ok(loaded_cards)) = storage.restore(KEY) {
+            if let Json(Ok(loaded_cards)) = storage.restore(CARDS_KEY) {
                 loaded_cards
             } else {
                 // If no such entry exists, create a new one
@@ -45,11 +50,22 @@ impl Component for CardsListing {
             }
         };
 
+        // Load the arena from localStorage
+        let arena = {
+            if let Ok(loaded_arena) = storage.restore(ARENA_KEY) {
+                // Remove the quotes & restore the arena from localStorage
+                Arena::from_str(&loaded_arena[1..&loaded_arena.len() - 1]).unwrap()
+            } else {
+                // If no such entry exists, default to the LegendaryArena
+                Arena::LegendaryArena
+            }
+        };
+
         // Compute the calculated values of all cards
-        CardEntry::compute_all(&mut cards);
+        CardEntry::compute_all(&mut cards, Some(&arena));
 
         // Sort by remaining time
-        cards.sort_by(CardEntry::sort_remaining);
+        cards.sort_by(CardEntry::sort_by_remaining(Some(&arena)));
 
         // Compute the in_order values
         CardEntry::sum_all(&mut cards).unwrap();
@@ -57,6 +73,7 @@ impl Component for CardsListing {
         let state = State {
             cards,
             real_pass: true,
+            arena,
         };
 
         Self {
@@ -70,7 +87,7 @@ impl Component for CardsListing {
         match msg {
             Msg::Create(mut card) => {
                 // Generate the computed values of the card
-                card.computed = card.calc_remaining(None);
+                card.computed = card.calc_remaining(Some(&self.state.arena));
 
                 // Add the card to the list
                 self.state.cards.push(card);
@@ -79,9 +96,8 @@ impl Component for CardsListing {
                 self.handle_state_change();
             }
             Msg::Update(index, mut card) => {
-                // TODO Support arenas other than the LegendaryArena
                 // Generate the computed values of the card
-                card.computed = card.calc_remaining(None);
+                card.computed = card.calc_remaining(Some(&self.state.arena));
 
                 // Replace the outdated card entry
                 self.state.cards[index] = card;
@@ -97,6 +113,25 @@ impl Component for CardsListing {
                 self.handle_state_change();
             }
             Msg::RealPass => self.state.real_pass = true,
+            Msg::SetArena(arena) => {
+                // Persist the data
+                self.state.arena = arena;
+                self.storage.store(ARENA_KEY, Json(&self.state.arena));
+
+                // Compute the calculated values of all cards
+                CardEntry::compute_all(&mut self.state.cards, Some(&self.state.arena));
+
+                // Sort by remaining time
+                self.state
+                    .cards
+                    .sort_by(CardEntry::sort_by_remaining(Some(&self.state.arena)));
+
+                // Compute the in_order values
+                CardEntry::sum_all(&mut self.state.cards).unwrap();
+
+                // Do a fake render first
+                self.state.real_pass = false;
+            }
         }
 
         // Re-render
@@ -110,7 +145,22 @@ impl Component for CardsListing {
     fn view(&self) -> Html {
         if self.state.real_pass {
             html! {
-                <div style=MY_STYLE>
+                <>
+
+                <div style=BOTTOM_PADDING>
+                    { "Selected arena: " }
+                    <select onchange=self.link.callback(|event: ChangeData| {
+                        if let yew::events::ChangeData::Select(data) = event {
+                            Msg::SetArena(Arena::from_str(&data.value()).unwrap())
+                        } else {
+                            panic!("Big oof");
+                        }
+                    }) >
+                        { self.get_arenas() }
+                    </select>
+                </div>
+
+                <div style=GRID>
 
                     // Render all cards
                     {
@@ -127,6 +177,8 @@ impl Component for CardsListing {
                     <CardInput on_create=self.link.callback(|card: CardEntry| Msg::Create(card)) />
 
                </div>
+
+               </>
             }
         } else {
             // Force a legit re-render (avoids memoization)
@@ -135,24 +187,52 @@ impl Component for CardsListing {
     }
 }
 
-const MY_STYLE: &str = "
+const GRID: &str = "
     display: grid;
     grid-template-columns: auto 4em 4em repeat(9, auto);
     gap: 5px;
 ";
 
+const BOTTOM_PADDING: &str = "
+    padding-bottom: 1em;
+";
+
 impl CardsListing {
     fn handle_state_change(&mut self) {
         // Sort by remaining time
-        self.state.cards.sort_by(CardEntry::sort_remaining);
+        self.state
+            .cards
+            .sort_by(CardEntry::sort_by_remaining(Some(&self.state.arena)));
 
         // Compute the in_order values
         CardEntry::sum_all(&mut self.state.cards).unwrap();
 
         // Persist the data
-        self.storage.store(KEY, Json(&self.state.cards));
+        self.storage.store(CARDS_KEY, Json(&self.state.cards));
 
         // Do a fake render first
         self.state.real_pass = false;
+    }
+
+    fn get_arenas(&self) -> Html {
+        Arena::iter()
+            .map(|arena| {
+                let name = format!("{:?}", arena);
+
+                // Skip the training camp
+                if arena == Arena::TrainingCamp {
+                    return html! {};
+                }
+
+                html! {
+                    <option
+                        value=name
+                        selected={self.state.arena == arena}
+                    >
+                        {name}
+                    </option>
+                }
+            })
+            .collect::<Html>()
     }
 }

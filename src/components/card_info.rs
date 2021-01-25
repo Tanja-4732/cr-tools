@@ -209,8 +209,6 @@ impl CardInfo {
     }
 
     fn get_rarities(&self, card: Option<&CardEntry>) -> Html {
-        // TODO cache/memoize this
-
         Rarity::iter()
             .map(|rarity| {
                 let name = format!("{:?}", rarity);

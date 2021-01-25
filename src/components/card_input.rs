@@ -91,7 +91,7 @@ impl Component for CardInput {
                         panic!("Big oof");
                     }
                 }) >
-                    { self.get_rarities(None) }
+                    { self.get_rarities() }
                 </select>
 
                 // Save changes button
@@ -108,20 +108,14 @@ impl Component for CardInput {
 }
 
 impl CardInput {
-    fn get_rarities(&self, card: Option<&CardEntry>) -> Html {
+    fn get_rarities(&self) -> Html {
         // TODO cache/memoize this
 
         Rarity::iter()
             .map(|rarity| {
                 let name = format!("{:?}", rarity);
 
-                let should_select = if let Some(c) = card {
-                    c.rarity == rarity
-                } else {
-                    false
-                };
-
-                html! {<option value=name selected={should_select}> {name} </option>}
+                html! {<option value=name> {name} </option>}
             })
             .collect::<Html>()
     }

@@ -53,8 +53,9 @@ pub enum Rarity {
     Legendary,
 }
 
+#[derive(Serialize, Deserialize, Debug, EnumIter, EnumString, PartialEq, Clone)]
 pub enum Arena {
-    TrainingCamp = 0,
+    TrainingCamp,
     GoblinStadium,
     BonePit,
     BarbarianBowl,

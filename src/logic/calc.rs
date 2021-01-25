@@ -22,14 +22,14 @@ pub struct CardData {
 }
 
 impl CardEntry {
-    pub fn calc_remaining(&self, arena: Option<Arena>) -> Option<CardData> {
+    pub fn calc_remaining(&self, arena: Option<&Arena>) -> Option<CardData> {
         // Cannot request legendary cards
         if self.rarity == Rarity::Legendary {
             return None;
         }
 
         // The arena the user is in (default to the LegendaryArena)
-        let request_size = get_request_size(&arena.unwrap_or(Arena::LegendaryArena));
+        let request_size = get_request_size(&arena.unwrap_or(&Arena::LegendaryArena));
 
         let cards_remaining = if self.get_needed() < self.have {
             0
@@ -69,35 +69,40 @@ impl CardEntry {
         })
     }
 
-    pub fn compute_all(list: &mut Vec<Self>) {
+    pub fn compute_all(list: &mut Vec<Self>, arena: Option<&Arena>) {
         for card in list {
-            card.computed = card.calc_remaining(None);
+            card.computed = card.calc_remaining(arena);
         }
     }
 
     /// Custom order algorithm for sorting CardEntries by days
-    pub fn sort_remaining(a: &Self, b: &Self) -> cmp::Ordering {
-        // Handle legendary cards
-        if a.rarity == Rarity::Legendary {
-            if b.rarity == Rarity::Legendary {
-                return cmp::Ordering::Equal;
-            } else {
-                return cmp::Ordering::Greater;
+    //  FnMut(&Self, &Self) -> cmp::Ordering
+    pub fn sort_by_remaining(
+        arena: Option<&Arena>,
+    ) -> Box<dyn FnMut(&Self, &Self) -> cmp::Ordering + '_> {
+        Box::new(move |a: &Self, b: &Self| {
+            // Handle legendary cards
+            if a.rarity == Rarity::Legendary {
+                if b.rarity == Rarity::Legendary {
+                    return cmp::Ordering::Equal;
+                } else {
+                    return cmp::Ordering::Greater;
+                }
             }
-        }
-        if b.rarity == Rarity::Legendary {
-            return cmp::Ordering::Less;
-        }
+            if b.rarity == Rarity::Legendary {
+                return cmp::Ordering::Less;
+            }
 
-        let get_remaining = |card: &CardEntry| {
-            card.computed
-                .clone()
-                .unwrap_or_else(|| card.calc_remaining(None).unwrap())
-                .days_remaining
-        };
+            let get_remaining = |card: &CardEntry| {
+                card.computed
+                    .clone()
+                    .unwrap_or_else(|| card.calc_remaining(arena).unwrap())
+                    .days_remaining
+            };
 
-        // Compare the cards
-        get_remaining(a).partial_cmp(&get_remaining(b)).unwrap()
+            // Compare the cards
+            get_remaining(a).partial_cmp(&get_remaining(b)).unwrap()
+        })
     }
 
     pub fn sum_all(list: &mut Vec<Self>) -> Result<()> {
