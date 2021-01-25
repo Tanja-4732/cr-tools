@@ -54,7 +54,7 @@ impl Component for CardInput {
         }
 
         // Don't re-render
-        false
+        true
     }
 
     fn change(&mut self, _: Self::Properties) -> ShouldRender {
