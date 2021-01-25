@@ -109,8 +109,6 @@ impl Component for CardInput {
 
 impl CardInput {
     fn get_rarities(&self) -> Html {
-        // TODO cache/memoize this
-
         Rarity::iter()
             .map(|rarity| {
                 let name = format!("{:?}", rarity);
