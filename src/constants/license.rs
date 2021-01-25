@@ -3,10 +3,13 @@
 use super::meta;
 
 /// The licence notice (AGPL 3) of the application
-pub const LICENSE: &'static str = concat![
+pub const LICENSE_SHORT: &'static str = concat![
     "Copyright 2021 Bernd-L; All rights reserved.\n",
-    "Licensed under the AGPL 3.0 <https://www.gnu.org/licenses/agpl-3.0.en.html>"
+    "Licensed under the AGPL 3.0"
 ];
+
+/// The licence URL (AGPL 3) of the application
+pub const LICENSE_URL: &'static str = "https://github.com/Bernd-L/cr-tools/blob/main/LICENSE.md";
 
 /// The title of the license notice
 pub fn license_notice_title() -> String {

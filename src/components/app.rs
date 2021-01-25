@@ -1,4 +1,5 @@
 use super::cards_listing::CardsListing;
+use crate::constants;
 use yew::prelude::*;
 
 /// The root component of cr-tools
@@ -24,7 +25,8 @@ impl Component for App {
         html! {
             <>
 
-            <h1>{ "cr-tools" }</h1>
+            <h1>{constants::meta::NAME}</h1>
+            {constants::meta::ABOUT}
             <p>
             { "This app is a work in progress, and my first Yew project." }
             <br />
@@ -35,7 +37,31 @@ impl Component for App {
 
             <CardsListing />
 
+
+            <p>
+                { "Get the source code "}
+                <a href="https://github.com/Bernd-L/cr-tools">{ "here" }</a>
+            </p>
+
+            <div style=BOXED>
+                <h3>{constants::license::license_notice_title()}</h3>
+
+                <p>
+                    {constants::license::LICENSE_SHORT} <br />
+                    {"The license: "} <a href=constants::license::LICENSE_URL>{constants::license::LICENSE_URL}</a>
+                </p>
+
+                {constants::license::license_notice_body()}
+            </div>
+
+            <br />
+            { "\"Clash Royale\" may be a trademark of its owner, with which I'm not affiliated with at all."}
+
             </>
         }
     }
 }
+
+const BOXED: &str = "
+    max-width: 700px;
+";
