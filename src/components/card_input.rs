@@ -66,11 +66,26 @@ impl Component for CardInput {
             <>
 
                 // The input fields for new cards
-                <input type="text" placeholder="name" oninput=self.link.callback(|i: InputData| Msg::UpdateName(i.value)) />
-                <input type="number" placeholder="level" oninput=self.link.callback(|i: InputData| Msg::UpdateLevel(i.value.parse::<usize>().unwrap())) />
-                <input type="number" placeholder="have" oninput=self.link.callback(|i: InputData| Msg::UpdateHave(i.value.parse::<usize>().unwrap())) />
-                <select onchange=self.link.callback(|i: ChangeData| {
-                    if let yew::events::ChangeData::Select(data) = i {
+                <input
+                    type="text"
+                    placeholder="name"
+                    oninput=self.link.callback(|i: InputData| Msg::UpdateName(i.value))
+                />
+
+                <input
+                    type="number"
+                    placeholder="level"
+                    oninput=self.link.callback(|i: InputData| Msg::UpdateLevel(i.value.parse::<usize>().unwrap()))
+                />
+
+                <input
+                    type="number"
+                    placeholder="have"
+                    oninput=self.link.callback(|i: InputData| Msg::UpdateHave(i.value.parse::<usize>().unwrap()))
+                />
+
+                <select onchange=self.link.callback(|event: ChangeData| {
+                    if let yew::events::ChangeData::Select(data) = event {
                         Msg::UpdateRarity(Rarity::from_str(&data.value()).unwrap())
                     } else {
                         panic!("Big oof");
@@ -78,7 +93,9 @@ impl Component for CardInput {
                 }) >
                     { self.get_rarities(None) }
                 </select>
-                <button onclick=self.link.callback(|c| Msg::Create)> {"Add"} </button>
+
+                // Save changes button
+                <button onclick=self.link.callback(|_| Msg::Create)> {"Add"} </button>
 
             </>
         }

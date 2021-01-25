@@ -3,8 +3,8 @@ use crate::logic::types::{CardEntry, CardType, Rarity};
 use chrono::{DateTime, Local};
 use float_pretty_print::PrettyPrintFloat;
 use serde_derive::{Deserialize, Serialize};
-use std::cmp;
 use std::iter::Filter;
+use std::{cmp, mem};
 use strum::IntoEnumIterator;
 use strum_macros::{EnumIter, ToString};
 use wasm_bindgen::prelude::*;
@@ -32,8 +32,8 @@ pub struct State {
 
 pub enum Msg {
     Create(CardEntry),
-    Update,
-    Delete,
+    Update(usize, CardEntry),
+    Delete(usize),
     RealPass,
 }
 
@@ -97,11 +97,33 @@ impl Component for CardsListing {
                 // Do a fake render first
                 self.state.real_pass = false;
             }
-            Msg::Update => {}
-            Msg::Delete => {}
+            Msg::Update(index, mut card) => {
+                // TODO Support arenas other than the LegendaryArena
+                // Generate the computed values of the card
+                card.computed = card.calc_remaining(None);
+
+                // Replace the outdated card entry
+                self.state.cards[index] = card;
+
+                // Sort by remaining time
+                self.state.cards.sort_by(CardEntry::sort_remaining);
+
+                // Compute the in_order values
+                CardEntry::sum_all(&mut self.state.cards).unwrap();
+
+                // Persist the data
+                self.storage.store(KEY, Json(&self.state.cards));
+
+                // Do a fake render first
+                self.state.real_pass = false;
+            }
+            Msg::Delete(index) => {
+                // TODO implement deletion
+            }
             Msg::RealPass => self.state.real_pass = true,
         }
 
+        // Re-render
         true
     }
 
@@ -116,8 +138,11 @@ impl Component for CardsListing {
 
                     // Render all cards
                     {
-                        for self.state.cards.iter().map(|c| html!{
-                            <CardInfo card=c.clone()/>
+                        for self.state.cards.iter().enumerate().map(|(i, card)| html!{
+                            <CardInfo
+                                card=card.clone()
+                                on_update=self.link.callback(move |c: CardEntry| Msg::Update(i, c))
+                            />
                         })
                     }
 
