@@ -18,13 +18,14 @@ use yew::{html, Component, ComponentLink, Href, Html, InputData, NodeRef, Should
 pub struct CardInfo {
     pub props: Props,
     link: ComponentLink<Self>,
-    clean: bool,
     card_backup: CardEntry,
+    state: State,
 }
 
 pub enum Msg {
     Update,
     Cancel,
+    Delete,
     UpdateName(String),
     UpdateLevel(usize),
     UpdateHave(usize),
@@ -35,6 +36,13 @@ pub enum Msg {
 pub struct Props {
     pub card: CardEntry,
     pub on_update: Callback<CardEntry>,
+    pub on_delete: Callback<()>,
+}
+
+enum State {
+    Clean,
+    Dirty,
+    Empty,
 }
 
 impl Component for CardInfo {
@@ -46,15 +54,21 @@ impl Component for CardInfo {
             card_backup: props.card.clone(),
             props,
             link,
-            clean: true,
+            state: State::Clean,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        self.clean = false;
+        self.state = State::Dirty;
 
         match msg {
-            Msg::UpdateName(name) => self.props.card.name = name,
+            Msg::UpdateName(name) => {
+                if name.is_empty() {
+                    self.state = State::Empty;
+                }
+
+                self.props.card.name = name;
+            }
             Msg::UpdateLevel(level) => self.props.card.level = level,
             Msg::UpdateHave(have) => self.props.card.have = have,
             Msg::UpdateRarity(rarity) => self.props.card.rarity = rarity,
@@ -63,14 +77,21 @@ impl Component for CardInfo {
                 self.props.on_update.emit(self.props.card.clone());
 
                 // Set as clean
-                self.clean = true;
+                self.state = State::Clean;
+            }
+            Msg::Delete => {
+                // Give the new card to the listing component
+                self.props.on_delete.emit(());
+
+                // Set as clean
+                self.state = State::Clean;
             }
             Msg::Cancel => {
                 // Restore the card from the backup
                 self.props.card = self.card_backup.clone();
 
                 // Set as clean
-                self.clean = true;
+                self.state = State::Clean;
             }
         }
 
@@ -83,81 +104,109 @@ impl Component for CardInfo {
     }
 
     fn view(&self) -> Html {
-        if self.clean {
-            if let Some(data) = &self.props.card.computed {
-                // Handle non-legendary cards
+        match self.state {
+            State::Clean => {
+                if let Some(data) = &self.props.card.computed {
+                    // Handle non-legendary cards
 
-                let get_date = |date: DateTime<Local>| date.date().format("%F");
+                    let get_date = |date: DateTime<Local>| date.date().format("%F");
 
-                html! {
-                    <>
+                    html! {
+                        <>
 
-                    // The input fields for new cards
-                    { self.view_inputs() }
+                        // The input fields for new cards
+                        { self.view_inputs() }
 
-                    // The calculated outputs for the card
-                    <span>{"Need: "} {self.props.card.get_needed()}</span>
-                    <span>{"Remaining: "} {data.cards_remaining}</span>
-                    <span>{"Requests: "} {data.requests_remaining}</span>
-                    <span>{"Weeks: "} {Self::simple_round(data.weeks_remaining.clone())}</span>
-                    <span>{"Days: "} {Self::simple_round(data.days_remaining.clone())}</span>
-                    <span>{"Days in order: "} {Self::simple_round(data.days_in_order.unwrap().clone())}</span>
-                    <span>{"Done on: "} {get_date(data.done_on)}</span>
-                    <span>{"Done in order: "} {get_date(data.done_in_order_on.unwrap())}</span>
+                        // The calculated outputs for the card
+                        <span>{"Need: "} {self.props.card.get_needed()}</span>
+                        <span>{"Remaining: "} {data.cards_remaining}</span>
+                        <span>{"Requests: "} {data.requests_remaining}</span>
+                        <span>{"Weeks: "} {Self::simple_round(data.weeks_remaining.clone())}</span>
+                        <span>{"Days: "} {Self::simple_round(data.days_remaining.clone())}</span>
+                        <span>{"Days in order: "} {Self::simple_round(data.days_in_order.unwrap().clone())}</span>
+                        <span>{"Done on: "} {get_date(data.done_on)}</span>
+                        <span>{"Done in order: "} {get_date(data.done_in_order_on.unwrap())}</span>
 
-                    </>
-                }
-            } else {
-                // Handle legendary cards
-
-                let cards_remaining = if self.props.card.get_needed() < self.props.card.have {
-                    0
+                        </>
+                    }
                 } else {
-                    self.props.card.get_needed() - self.props.card.have
-                };
+                    // Handle legendary cards
 
+                    let cards_remaining = if self.props.card.get_needed() < self.props.card.have {
+                        0
+                    } else {
+                        self.props.card.get_needed() - self.props.card.have
+                    };
+
+                    html! {
+                        <>
+
+                        // The input fields for new cards
+                        { self.view_inputs() }
+
+                        // The calculated outputs for the card
+                        <span>{"Need: "} {self.props.card.get_needed()}</span>
+                        <span>{"Remaining: "} { cards_remaining }</span>
+                        <span>{"Requests: n/a"}</span>
+                        <span>{"Weeks: n/a"}</span>
+                        <span>{"Days: n/a"}</span>
+                        <span>{"Days in order: n/a"}</span>
+                        <span>{"Done on: n/a"}</span>
+                        <span>{"Done in order: n/a"}</span>
+
+                        </>
+                    }
+                }
+            }
+            State::Dirty => {
+                // Handle editing
                 html! {
                     <>
 
                     // The input fields for new cards
                     { self.view_inputs() }
 
-                    // The calculated outputs for the card
-                    <span>{"Need: "} {self.props.card.get_needed()}</span>
-                    <span>{"Remaining: "} { cards_remaining }</span>
-                    <span>{"Requests: n/a"}</span>
-                    <span>{"Weeks: n/a"}</span>
-                    <span>{"Days: n/a"}</span>
-                    <span>{"Days in order: n/a"}</span>
-                    <span>{"Done on: n/a"}</span>
-                    <span>{"Done in order: n/a"}</span>
+                    // Save edits button
+                    <button onclick=self.link.callback(|_| Msg::Update)> {"Save"} </button>
+
+                    // Cancel button
+                    <button onclick=self.link.callback(|_| Msg::Cancel)> {"Cancel"} </button>
+
+                    // Padding
+                    <span/>
+                    <span/>
+                    <span/>
+                    <span/>
+                    <span/>
+                    <span/>
 
                     </>
                 }
             }
-        } else {
-            // Handle editing
-            html! {
-                <>
+            State::Empty => {
+                // Handle empty
+                html! {
+                    <>
 
-                // The input fields for new cards
-                { self.view_inputs() }
+                    // The input fields for new cards
+                    { self.view_inputs() }
 
-                // Save edits button
-                <button onclick=self.link.callback(|_| Msg::Update)> {"Save"} </button>
+                    // Save edits button
+                    <button onclick=self.link.callback(|_| Msg::Delete)> {"Delete"} </button>
 
-                // Cancel button
-                <button onclick=self.link.callback(|_| Msg::Cancel)> {"Cancel"} </button>
+                    // Cancel button
+                    <button onclick=self.link.callback(|_| Msg::Cancel)> {"Cancel"} </button>
 
-                // Padding
-                <span/>
-                <span/>
-                <span/>
-                <span/>
-                <span/>
-                <span/>
+                    // Padding
+                    <span/>
+                    <span/>
+                    <span/>
+                    <span/>
+                    <span/>
+                    <span/>
 
-                </>
+                    </>
+                }
             }
         }
     }

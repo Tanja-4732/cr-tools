@@ -85,17 +85,8 @@ impl Component for CardsListing {
                 // Add the card to the list
                 self.state.cards.push(card);
 
-                // Sort by remaining time
-                self.state.cards.sort_by(CardEntry::sort_remaining);
-
-                // Compute the in_order values
-                CardEntry::sum_all(&mut self.state.cards).unwrap();
-
-                // Persist the data
-                self.storage.store(KEY, Json(&self.state.cards));
-
-                // Do a fake render first
-                self.state.real_pass = false;
+                // Handle the state change
+                self.handle_state_change();
             }
             Msg::Update(index, mut card) => {
                 // TODO Support arenas other than the LegendaryArena
@@ -105,20 +96,15 @@ impl Component for CardsListing {
                 // Replace the outdated card entry
                 self.state.cards[index] = card;
 
-                // Sort by remaining time
-                self.state.cards.sort_by(CardEntry::sort_remaining);
-
-                // Compute the in_order values
-                CardEntry::sum_all(&mut self.state.cards).unwrap();
-
-                // Persist the data
-                self.storage.store(KEY, Json(&self.state.cards));
-
-                // Do a fake render first
-                self.state.real_pass = false;
+                // Handle the state change
+                self.handle_state_change();
             }
             Msg::Delete(index) => {
-                // TODO implement deletion
+                // Remove the card
+                self.state.cards.remove(index);
+
+                // Handle the state change
+                self.handle_state_change();
             }
             Msg::RealPass => self.state.real_pass = true,
         }
@@ -142,6 +128,7 @@ impl Component for CardsListing {
                             <CardInfo
                                 card=card.clone()
                                 on_update=self.link.callback(move |c: CardEntry| Msg::Update(i, c))
+                                on_delete=self.link.callback(move |_| Msg::Delete(i),)
                             />
                         })
                     }
@@ -163,3 +150,19 @@ const MY_STYLE: &str = "
     grid-template-columns: auto 4em 4em repeat(9, auto);
     gap: 5px;
 ";
+
+impl CardsListing {
+    fn handle_state_change(&mut self) {
+        // Sort by remaining time
+        self.state.cards.sort_by(CardEntry::sort_remaining);
+
+        // Compute the in_order values
+        CardEntry::sum_all(&mut self.state.cards).unwrap();
+
+        // Persist the data
+        self.storage.store(KEY, Json(&self.state.cards));
+
+        // Do a fake render first
+        self.state.real_pass = false;
+    }
+}

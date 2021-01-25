@@ -30,7 +30,7 @@ impl Component for App {
             <br />
             { "Some functionality might not be implemented yet. Please be patient." }
             <br />
-            <em>{ "Changes are not yet supported" }</em>
+            <em>{ "Only edit one element at a time - clear name to delete" }</em>
             </p>
 
             <CardsListing />

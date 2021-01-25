@@ -95,7 +95,12 @@ impl Component for CardInput {
                 </select>
 
                 // Save changes button
-                <button onclick=self.link.callback(|_| Msg::Create)> {"Add"} </button>
+                <button
+                    onclick=self.link.callback(|_| Msg::Create)
+                    disabled={self.card.name.is_empty()}
+                >
+                    {"Add"}
+                </button>
 
             </>
         }
