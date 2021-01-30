@@ -1,5 +1,7 @@
 # cr-tools
 
+[![dependency status](https://deps.rs/crate/cr-tools/1.0.1/status.svg)](https://deps.rs/crate/cr-tools/1.0.1)
+
 A simple calculator for [Clash Royale](https://clashroyale.fandom.com/wiki/Cards)
 
 This crate implements both a simple library and a [Yew](https://yew.rs/docs/en/) web application.
