@@ -57,8 +57,12 @@ impl Component for CardInput {
         true
     }
 
-    fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        true
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        // Use a new callback if there is one
+        self.props = props;
+
+        // Don't re-render to avoid losing unsaved state
+        false
     }
 
     fn view(&self) -> Html {

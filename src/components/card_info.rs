@@ -90,7 +90,13 @@ impl Component for CardInfo {
         true
     }
 
-    fn change(&mut self, _: Self::Properties) -> ShouldRender {
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        // Apply the new state
+        self.props = props;
+
+        // TODO Handle non-clean states to avoid losing data during edits
+
+        // Re-render with the new state
         true
     }
 

@@ -28,7 +28,6 @@ pub enum Msg {
     Create(CardEntry),
     Update(usize, CardEntry),
     Delete(usize),
-    RealPass,
     SetArena(Arena),
 }
 
@@ -112,7 +111,6 @@ impl Component for CardsListing {
                 // Handle the state change
                 self.handle_state_change();
             }
-            Msg::RealPass => self.state.real_pass = true,
             Msg::SetArena(arena) => {
                 // Persist the data
                 self.state.arena = arena;
@@ -128,9 +126,6 @@ impl Component for CardsListing {
 
                 // Compute the in_order values
                 CardEntry::sum_all(&mut self.state.cards).unwrap();
-
-                // Do a fake render first
-                self.state.real_pass = false;
             }
         }
 
@@ -143,46 +138,41 @@ impl Component for CardsListing {
     }
 
     fn view(&self) -> Html {
-        if self.state.real_pass {
-            html! {
-                <>
+        html! {
+            <>
 
-                <div style=BOTTOM_PADDING>
-                    { "Selected arena: " }
-                    <select onchange=self.link.callback(|event: ChangeData| {
-                        if let yew::events::ChangeData::Select(data) = event {
-                            Msg::SetArena(Arena::from_str(&data.value()).unwrap())
-                        } else {
-                            panic!("Big oof");
-                        }
-                    }) >
-                        { self.get_arenas() }
-                    </select>
-                </div>
-
-                <div style=GRID>
-
-                    // Render all cards
-                    {
-                        for self.state.cards.iter().enumerate().map(|(i, card)| html!{
-                            <CardInfo
-                                card=card.clone()
-                                on_update=self.link.callback(move |c: CardEntry| Msg::Update(i, c))
-                                on_delete=self.link.callback(move |_| Msg::Delete(i),)
-                            />
-                        })
+            <div style=BOTTOM_PADDING>
+                { "Selected arena: " }
+                <select onchange=self.link.callback(|event: ChangeData| {
+                    if let yew::events::ChangeData::Select(data) = event {
+                        Msg::SetArena(Arena::from_str(&data.value()).unwrap())
+                    } else {
+                        panic!("Big oof");
                     }
+                }) >
+                    { self.get_arenas() }
+                </select>
+            </div>
 
-                    // Show a field for card input
-                    <CardInput on_create=self.link.callback(|card: CardEntry| Msg::Create(card)) />
+            <div style=GRID>
 
-               </div>
+                // Render all cards
+                {
+                    for self.state.cards.iter().enumerate().map(|(i, card)| html!{
+                        <CardInfo
+                            card=card.clone()
+                            on_update=self.link.callback(move |c: CardEntry| Msg::Update(i, c))
+                            on_delete=self.link.callback(move |_| Msg::Delete(i),)
+                        />
+                    })
+                }
 
-               </>
-            }
-        } else {
-            // Force a legit re-render (avoids memoization)
-            html! { <img src="" onerror=self.link.callback(|_| Msg::RealPass) />}
+                // Show a field for card input
+                <CardInput on_create=self.link.callback(|card: CardEntry| Msg::Create(card)) />
+
+           </div>
+
+           </>
         }
     }
 }
