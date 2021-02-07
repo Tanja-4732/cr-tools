@@ -179,7 +179,7 @@ impl Component for CardsListing {
 
 const GRID: &str = "
     display: grid;
-    grid-template-columns: auto 4em 4em repeat(9, auto);
+    grid-template-columns: auto 4em 4em repeat(10, auto);
     gap: 5px;
 ";
 

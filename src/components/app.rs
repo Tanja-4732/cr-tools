@@ -28,15 +28,11 @@ impl Component for App {
             <h1>{constants::meta::NAME}</h1>
             {constants::meta::ABOUT}
             <p>
-            { "This app is a work in progress, and my first Yew project." }
-            <br />
-            { "Some functionality might not be implemented yet. Please be patient." }
-            <br />
-            <em>{ "Only edit one element at a time - clear name to delete" }</em>
+                <em>{ "Only edit one element at a time - clear name to delete" }</em>
             </p>
 
+            // The main application
             <CardsListing />
-
 
             <p>
                 { "Get the source code "}

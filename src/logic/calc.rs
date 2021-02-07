@@ -31,10 +31,10 @@ impl CardEntry {
         // The arena the user is in (default to the LegendaryArena)
         let request_size = get_request_size(&arena.unwrap_or(&Arena::LegendaryArena));
 
-        let cards_remaining = if self.get_needed() < self.have {
+        let cards_remaining = if self.get_needed_cards() < self.have {
             0
         } else {
-            self.get_needed() - self.have
+            self.get_needed_cards() - self.have
         };
 
         let requests_remaining = (cards_remaining as f64

@@ -174,26 +174,58 @@ const RARE_OFFSET: usize = 2;
 const EPIC_OFFSET: usize = 5;
 const LEGENDARY_OFFSET: usize = 8;
 
+const NEEDED_GOLD: [usize; 13] = [
+    0, 5, 20, 50, 150, 400, 1000, 2000, 4000, 8000, 20000, 50000, 100000,
+];
+
 impl CardEntry {
     /// Calculates the amount of required cards to upgrade to the next level (or 0 when on 13)
-    pub fn get_needed(&self) -> usize {
+    pub fn get_needed_cards(&self) -> usize {
         if self.level == 13 {
             return 0;
         };
 
-        let level_clip = |level: usize| {
-            if level < 1 {
+        let use_offset = |offset: usize| {
+            if self.level < 1 {
                 panic!("Invalid level")
             } else {
-                level
+                NEEDED_CARDS[self.level - offset]
             }
         };
 
         match self.rarity {
-            Rarity::Common => NEEDED_CARDS[level_clip(self.level - COMMON_OFFSET)],
-            Rarity::Rare => NEEDED_CARDS[level_clip(self.level - RARE_OFFSET)],
-            Rarity::Epic => NEEDED_CARDS[level_clip(self.level - EPIC_OFFSET)],
-            Rarity::Legendary => NEEDED_CARDS[level_clip(self.level - LEGENDARY_OFFSET)],
+            Rarity::Common => use_offset(COMMON_OFFSET),
+            Rarity::Rare => use_offset(RARE_OFFSET),
+            Rarity::Epic => use_offset(EPIC_OFFSET),
+            Rarity::Legendary => use_offset(LEGENDARY_OFFSET),
+        }
+    }
+
+    /// Calculates the amount of required gold to upgrade to the next level (or 0 when on 13)
+    pub fn get_needed_gold(&self) -> usize {
+        if self.level == 13 {
+            return 0;
+        }
+
+        match self.rarity {
+            Rarity::Common => NEEDED_GOLD[self.level],
+            Rarity::Rare => NEEDED_GOLD[self.level],
+            Rarity::Epic if self.level == 6 => 400,
+            Rarity::Epic => NEEDED_GOLD[self.level],
+            Rarity::Legendary if self.level == 9 => 5000,
+            Rarity::Legendary => NEEDED_GOLD[self.level],
+        }
+    }
+
+    /// Calculates the amount of required gold to upgrade to the next level (or 0 when on 13)
+    /// as a String, formatting a `usize` not below 1000 as `{:.3}K`, with the actual number divided by 1000
+    pub fn get_needed_gold_string(&self) -> String {
+        let needed = self.get_needed_gold();
+
+        if needed < 1000 {
+            needed.to_string()
+        } else {
+            format!("{:.3}K", needed / 1000)
         }
     }
 }

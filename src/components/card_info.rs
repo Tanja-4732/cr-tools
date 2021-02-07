@@ -115,7 +115,7 @@ impl Component for CardInfo {
                         { self.view_inputs() }
 
                         // The calculated outputs for the card
-                        <span>{"Need: "} {self.props.card.get_needed()}</span>
+                        <span>{"Need: "} {self.props.card.get_needed_cards()}</span>
                         <span>{"Remaining: "} {data.cards_remaining}</span>
                         <span>{"Requests: "} {data.requests_remaining}</span>
                         <span>{"Weeks: "} {Self::simple_round(data.weeks_remaining.clone())}</span>
@@ -123,17 +123,19 @@ impl Component for CardInfo {
                         <span>{"Days in order: "} {Self::simple_round(data.days_in_order.unwrap().clone())}</span>
                         <span>{"Done on: "} {get_date(data.done_on)}</span>
                         <span>{"Done in order: "} {get_date(data.done_in_order_on.unwrap())}</span>
+                        <span>{"Gold needed: "} {self.props.card.get_needed_gold_string()}</span>
 
                         </>
                     }
                 } else {
                     // Handle legendary cards
 
-                    let cards_remaining = if self.props.card.get_needed() < self.props.card.have {
-                        0
-                    } else {
-                        self.props.card.get_needed() - self.props.card.have
-                    };
+                    let cards_remaining =
+                        if self.props.card.get_needed_cards() < self.props.card.have {
+                            0
+                        } else {
+                            self.props.card.get_needed_cards() - self.props.card.have
+                        };
 
                     html! {
                         <>
@@ -142,7 +144,7 @@ impl Component for CardInfo {
                         { self.view_inputs() }
 
                         // The calculated outputs for the card
-                        <span>{"Need: "} {self.props.card.get_needed()}</span>
+                        <span>{"Need: "} {self.props.card.get_needed_cards()}</span>
                         <span>{"Remaining: "} { cards_remaining }</span>
                         <span>{"Requests: n/a"}</span>
                         <span>{"Weeks: n/a"}</span>
@@ -150,6 +152,7 @@ impl Component for CardInfo {
                         <span>{"Days in order: n/a"}</span>
                         <span>{"Done on: n/a"}</span>
                         <span>{"Done in order: n/a"}</span>
+                        <span>{"Gold needed: "} {self.props.card.get_needed_gold_string()}</span>
 
                         </>
                     }
@@ -176,6 +179,7 @@ impl Component for CardInfo {
                     <span/>
                     <span/>
                     <span/>
+                    <span/>
 
                     </>
                 }
@@ -195,6 +199,7 @@ impl Component for CardInfo {
                     <button onclick=self.link.callback(|_| Msg::Cancel)> {"Cancel"} </button>
 
                     // Padding
+                    <span/>
                     <span/>
                     <span/>
                     <span/>
