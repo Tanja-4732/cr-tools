@@ -1,6 +1,6 @@
 # cr-tools
 
-[![dependency status](https://deps.rs/crate/cr-tools/1.0.1/status.svg)](https://deps.rs/crate/cr-tools/1.0.1)
+[![dependency status](https://deps.rs/crate/cr-tools/1.1.0/status.svg)](https://deps.rs/crate/cr-tools/1.1.0)
 
 A simple calculator for [Clash Royale](https://clashroyale.fandom.com/wiki/Cards)
 
