@@ -8,6 +8,23 @@ This crate implements both a simple library and a [Yew](https://yew.rs/docs/en/)
 
 Check out a live deployment of the `main` branch at <https://cr-tools.vercel.app>.
 
+## Build process
+
+Since this app is deployed using Vercel, it runs a build script to set up the build dependencies. This can be accomplished by running the following command in the repo root: `INSTALL_RUST_WASM_DEPS=true ./build.sh`.
+
+The script is made for Amazon Linux, and is meant to be run inside of an ephemeral container-like environment.
+
+If your package manager isn't yum, or you don't want to have random dependencies installed to your system, run the following command to build the application directly: `trunk build -d public`, or run `trunk serve -d public` to run a dev server.
+
+This obviously requires [trunk](https://trunkrs.dev/) to [be installed](https://trunkrs.dev/#install). To do that run:
+
+```zsh
+cargo install --locked trunk
+cargo install wasm-bindgen-cli
+```
+
+After this is installed I'd recommend you use `trunk serve -d public` to run the app.
+
 ## Licence & Copyright
 
 Copyright (c) 2021 Bernd-L. All rights reserved.

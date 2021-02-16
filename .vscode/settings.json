@@ -3,6 +3,7 @@
   "rust-analyzer.diagnostics.disabled": ["macro-error", "missing-unsafe"],
   "cSpell.words": [
     "PekkasPlayhouse",
+    "Vercel",
     "chrono",
     "concat",
     "onchange",
