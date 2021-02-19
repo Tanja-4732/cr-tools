@@ -17,6 +17,7 @@ include = [
     "/build.sh",
     "/container-build.sh",
     "/src",
+    "index.html",
 ]
 
 
