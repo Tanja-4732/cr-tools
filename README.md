@@ -10,9 +10,7 @@ Check out a live deployment of the `main` branch at <https://cr-tools.vercel.app
 
 ## Build process
 
-Since this app is deployed using Vercel, it runs a build script to set up the build dependencies. This can be accomplished by running the following command in the repo root: `INSTALL_RUST_WASM_DEPS=true ./build.sh`.
-
-The script is made for Amazon Linux, and is meant to be run inside of an ephemeral container-like environment.
+Since this app is deployed using Vercel, it needs to run a build script to set up the build dependencies. This can be accomplished by running the following command in the repo root: `INSTALL_RUST_WASM_DEPS=true ./build.sh`. The script is made for Amazon Linux, and is meant to be run inside of an ephemeral container-like environment.
 
 If your package manager isn't yum, or you don't want to have random dependencies installed to your system, run the following command to build the application directly: `trunk build -d public`, or run `trunk serve -d public` to run a dev server.
 

@@ -21,6 +21,7 @@ pub enum Msg {
 #[derive(Properties, Clone)]
 pub struct Props {
     pub on_create: Callback<CardEntry>,
+    pub total_gold: String,
 }
 
 impl Component for CardInput {
@@ -105,6 +106,18 @@ impl Component for CardInput {
                 >
                     {"Add"}
                 </button>
+
+                // Padding
+                <span/>
+                <span/>
+                <span/>
+                <span/>
+                <span/>
+                <span/>
+                <span/>
+
+                // Total gold needed
+                <span>{"Total needed: "} {&self.props.total_gold}</span>
 
             </>
         }

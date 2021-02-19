@@ -1,5 +1,5 @@
 use super::{card_info::CardInfo, card_input::CardInput};
-use crate::logic::types::{Arena, CardEntry};
+use crate::logic::types::{gold_string, Arena, CardEntry};
 use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
 use strum::IntoEnumIterator;
@@ -138,6 +138,13 @@ impl Component for CardsListing {
     }
 
     fn view(&self) -> Html {
+        let total_gold = gold_string(
+            self.state
+                .cards
+                .iter()
+                .fold(0, |acc, card| acc + card.get_needed_gold()),
+        );
+
         html! {
             <>
 
@@ -168,7 +175,10 @@ impl Component for CardsListing {
                 }
 
                 // Show a field for card input
-                <CardInput on_create=self.link.callback(|card: CardEntry| Msg::Create(card)) />
+                <CardInput
+                    on_create=self.link.callback(|card: CardEntry| Msg::Create(card))
+                    total_gold=total_gold
+                />
 
            </div>
 

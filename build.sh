@@ -44,4 +44,4 @@ else
 fi
 
 # Build the project
-trunk build -d public
+trunk build -d public --release

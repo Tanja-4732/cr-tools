@@ -220,12 +220,14 @@ impl CardEntry {
     /// Calculates the amount of required gold to upgrade to the next level (or 0 when on 13)
     /// as a String, formatting a `usize` not below 1000 as `{:.3}K`, with the actual number divided by 1000
     pub fn get_needed_gold_string(&self) -> String {
-        let needed = self.get_needed_gold();
+        gold_string(self.get_needed_gold())
+    }
+}
 
-        if needed < 1000 {
-            needed.to_string()
-        } else {
-            format!("{:.3}K", needed / 1000)
-        }
+pub fn gold_string(number: usize) -> String {
+    if number < 1000 {
+        number.to_string()
+    } else {
+        format!("{:.3}K", number / 1000)
     }
 }
