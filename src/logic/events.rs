@@ -15,6 +15,10 @@ impl EventSourcingService {
         }
     }
 
+    pub fn load(projector: Projector<CardEntry>) -> Self {
+        Self { projector }
+    }
+
     pub fn migrate_from_v1(old_cards: Vec<CardEntryV1>) -> Result<Self> {
         let mut projector = Projector::new();
 
@@ -31,7 +35,7 @@ impl EventSourcingService {
         &self.projector
     }
 
-    pub fn borrow_mut(&mut self) -> &Projector<CardEntry> {
+    pub fn borrow_mut(&mut self) -> &mut Projector<CardEntry> {
         &mut self.projector
     }
 }

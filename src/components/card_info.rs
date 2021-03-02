@@ -27,7 +27,7 @@ pub enum Msg {
 pub struct Props {
     pub card: CardEntry,
     pub on_update: Callback<CardEntry>,
-    pub on_delete: Callback<()>,
+    pub on_delete: Callback<CardEntry>,
 }
 
 enum State {
@@ -72,7 +72,7 @@ impl Component for CardInfo {
             }
             Msg::Delete => {
                 // Give the new card to the listing component
-                self.props.on_delete.emit(());
+                self.props.on_delete.emit(self.props.card.clone());
 
                 // Set as clean
                 self.state = State::Clean;

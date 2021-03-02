@@ -3,8 +3,9 @@ use crate::logic::{
     events::EventSourcingService,
     types::{gold_string, Arena, CardEntry, CardEntryV1},
 };
+use libocc::Event;
 use serde_derive::{Deserialize, Serialize};
-use std::{borrow::Borrow, str::FromStr};
+use std::str::FromStr;
 use strum::IntoEnumIterator;
 use yew::format::Json;
 use yew::prelude::*;
@@ -25,14 +26,13 @@ pub struct CardsListing {
 #[derive(Serialize, Deserialize)]
 pub struct State {
     cards: Vec<CardEntry>,
-    real_pass: bool,
     arena: Arena,
 }
 
 pub enum Msg {
     Create(CardEntry),
     Update(usize, CardEntry),
-    Delete(usize),
+    Delete(usize, CardEntry),
     SetArena(Arena),
 }
 
@@ -45,14 +45,17 @@ impl Component for CardsListing {
         let mut storage = StorageService::new(Area::Local).expect("Cannot use localStorage");
 
         // Load the cards from localStorage
-        let mut events = {
-            if let Json(Ok(old_cards)) = storage.restore(CARDS_KEY_V1) {
+        let events = {
+            if let Json(Ok(events)) = storage.restore(CARD_EVENTS_KEY) {
+                // Load the event log from localStorage
+                EventSourcingService::load(events)
+            } else if let Json(Ok(old_cards)) = storage.restore(CARDS_KEY_V1) {
                 // Tell the compiler about the type
                 // TODO improve or report bug/suggestion to rust lang
                 let old_cards: Vec<CardEntryV1> = old_cards;
 
                 // Convert the old format to the new one
-                let mut events = EventSourcingService::migrate_from_v1(old_cards).unwrap();
+                let events = EventSourcingService::migrate_from_v1(old_cards).unwrap();
 
                 // Persist the data (including the new UUIDs)
                 storage.store(CARD_EVENTS_KEY, Json(&events.borrow()));
@@ -88,11 +91,8 @@ impl Component for CardsListing {
         // Compute the in_order values
         CardEntry::sum_all(&mut cards).unwrap();
 
-        let state = State {
-            cards,
-            real_pass: true,
-            arena,
-        };
+        // The state of the application
+        let state = State { cards, arena };
 
         Self {
             link,
@@ -105,6 +105,12 @@ impl Component for CardsListing {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::Create(mut card) => {
+                // Make a create event
+                self.events
+                    .borrow_mut()
+                    .push(Event::create(card.clone()))
+                    .unwrap();
+
                 // Generate the computed values of the card
                 card.computed = card.calc_remaining(Some(&self.state.arena));
 
@@ -115,6 +121,12 @@ impl Component for CardsListing {
                 self.handle_state_change();
             }
             Msg::Update(index, mut card) => {
+                // Make an update event
+                self.events
+                    .borrow_mut()
+                    .push(Event::update(card.clone()))
+                    .unwrap();
+
                 // Generate the computed values of the card
                 card.computed = card.calc_remaining(Some(&self.state.arena));
 
@@ -124,7 +136,10 @@ impl Component for CardsListing {
                 // Handle the state change
                 self.handle_state_change();
             }
-            Msg::Delete(index) => {
+            Msg::Delete(index, card) => {
+                // Make a create event
+                self.events.borrow_mut().push(Event::delete(card)).unwrap();
+
                 // Remove the card
                 self.state.cards.remove(index);
 
@@ -189,7 +204,7 @@ impl Component for CardsListing {
                         <CardInfo
                             card=card.clone()
                             on_update=self.link.callback(move |c: CardEntry| Msg::Update(i, c))
-                            on_delete=self.link.callback(move |_| Msg::Delete(i),)
+                            on_delete=self.link.callback(move |c: CardEntry| Msg::Delete(i, c),)
                         />
                     })
                 }
@@ -228,10 +243,8 @@ impl CardsListing {
         CardEntry::sum_all(&mut self.state.cards).unwrap();
 
         // Persist the data
-        self.storage.store(CARDS_KEY_V1, Json(&self.state.cards));
-
-        // Do a fake render first
-        self.state.real_pass = false;
+        self.storage
+            .store(CARD_EVENTS_KEY, Json(&self.events.borrow()));
     }
 
     fn get_arenas(&self) -> Html {

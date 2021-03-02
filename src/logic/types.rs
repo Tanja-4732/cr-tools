@@ -40,7 +40,7 @@ impl CardEntryV1 {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct CardEntry {
     /// The UUID of the card  
     /// Used for tracking renames
@@ -77,6 +77,13 @@ impl CardEntry {
             rarity: Rarity::Common,
             computed: None,
         }
+    }
+}
+
+// Implemented manually to distinguish between card entries based on their UUIDs
+impl PartialEq for CardEntry {
+    fn eq(&self, other: &Self) -> bool {
+        self.uuid == other.uuid
     }
 }
 
