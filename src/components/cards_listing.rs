@@ -1,14 +1,16 @@
 use super::{card_info::CardInfo, card_input::CardInput};
-use crate::logic::types::{gold_string, Arena, CardEntry, CardEntryV1};
+use crate::logic::{
+    events::EventSourcingService,
+    types::{gold_string, Arena, CardEntry, CardEntryV1},
+};
 use serde_derive::{Deserialize, Serialize};
-use std::str::FromStr;
+use std::{borrow::Borrow, str::FromStr};
 use strum::IntoEnumIterator;
 use yew::format::Json;
 use yew::prelude::*;
 use yew::services::storage::{Area, StorageService};
 
 const CARDS_KEY_V1: &str = "cr-tools.state.cards";
-const CARDS_KEY_V2: &str = "cr-tools.state.cards_2";
 const CARD_EVENTS_KEY: &str = "cr-tools.events.cards";
 const ARENA_KEY: &str = "cr-tools.state.arena";
 
@@ -16,6 +18,7 @@ const ARENA_KEY: &str = "cr-tools.state.arena";
 pub struct CardsListing {
     link: ComponentLink<Self>,
     storage: StorageService,
+    events: EventSourcingService,
     state: State,
 }
 
@@ -42,29 +45,23 @@ impl Component for CardsListing {
         let mut storage = StorageService::new(Area::Local).expect("Cannot use localStorage");
 
         // Load the cards from localStorage
-        let mut cards = {
-            if let Json(Ok(loaded_cards)) = storage.restore(CARDS_KEY_V2) {
-                // If the cards already have the new format, return them
-                loaded_cards
-            } else if let Json(Ok(loaded_cards)) = storage.restore(CARDS_KEY_V1) {
+        let mut events = {
+            if let Json(Ok(old_cards)) = storage.restore(CARDS_KEY_V1) {
                 // Tell the compiler about the type
                 // TODO improve or report bug/suggestion to rust lang
-                let loaded_cards: Vec<CardEntryV1> = loaded_cards;
-
-                let mut new_cards = vec![];
+                let old_cards: Vec<CardEntryV1> = old_cards;
 
                 // Convert the old format to the new one
-                for card in loaded_cards {
-                    new_cards.push(CardEntryV1::retrofit_uuid(card));
-                }
+                let mut events = EventSourcingService::migrate_from_v1(old_cards).unwrap();
 
                 // Persist the data (including the new UUIDs)
-                storage.store(CARDS_KEY_V2, Json(&new_cards));
+                storage.store(CARD_EVENTS_KEY, Json(&events.borrow()));
 
-                new_cards
+                // Use the converted events
+                events
             } else {
                 // If no such entry exists, create a new one
-                Vec::new()
+                EventSourcingService::new()
             }
         };
 
@@ -78,6 +75,9 @@ impl Component for CardsListing {
                 Arena::LegendaryArena
             }
         };
+
+        // Create a mutable copy of the current projection for sorting
+        let mut cards = events.borrow().get_projection().clone();
 
         // Compute the calculated values of all cards
         CardEntry::compute_all(&mut cards, Some(&arena));
@@ -96,6 +96,7 @@ impl Component for CardsListing {
 
         Self {
             link,
+            events,
             storage,
             state,
         }

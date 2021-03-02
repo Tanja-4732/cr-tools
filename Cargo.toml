@@ -31,7 +31,7 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 yew = "0.17"
 wasm-bindgen = "0.2"
-libocc = "0.3"
+libocc = "0.4"
 strum = "0.20.0"
 strum_macros = "0.20.1"
 serde = "1"
@@ -41,3 +41,4 @@ anyhow = "1.0.38"
 thiserror = "1.0.23"
 float-pretty-print = "0.1.0"
 uuid = { version = "0.8", features = ["serde", "v4", "wasm-bindgen"] }
+lazy_static = "1.4.0"
