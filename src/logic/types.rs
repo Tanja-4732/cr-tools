@@ -1,10 +1,15 @@
 use serde_derive::{Deserialize, Serialize};
 use strum_macros::{EnumIter, EnumString};
+use uuid::Uuid;
 
 use super::calc::CardData;
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct CardEntry {
+    /// The UUID of the card  
+    /// Used for tracking renames
+    pub uuid: Uuid,
+
     /// The name of the card
     pub name: String,
 
@@ -28,6 +33,7 @@ pub struct CardEntry {
 impl CardEntry {
     pub fn new() -> Self {
         Self {
+            uuid: Uuid::new_v4(),
             name: String::new(),
             have: 0,
             level: 9,
