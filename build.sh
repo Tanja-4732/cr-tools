@@ -41,6 +41,8 @@ else
   # TODO install trunk using wget instad of building it using cargo
   # wget -qO- https://github.com/thedodd/trunk/releases/download/v0.8.2/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf-
 
+  # Weird wasm-bindgen fix
+  cargo update -p wasm-bindgen
 fi
 
 # Build the project
