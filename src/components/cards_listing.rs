@@ -1,5 +1,5 @@
 use super::{card_info::CardInfo, card_input::CardInput};
-use crate::logic::types::{gold_string, Arena, CardEntry};
+use crate::logic::types::{gold_string, Arena, CardEntry, CardEntryV1};
 use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
 use strum::IntoEnumIterator;
@@ -7,7 +7,9 @@ use yew::format::Json;
 use yew::prelude::*;
 use yew::services::storage::{Area, StorageService};
 
-const CARDS_KEY: &str = "cr-tools.state.cards";
+const CARDS_KEY_V1: &str = "cr-tools.state.cards";
+const CARDS_KEY_V2: &str = "cr-tools.state.cards_2";
+const CARD_EVENTS_KEY: &str = "cr-tools.events.cards";
 const ARENA_KEY: &str = "cr-tools.state.arena";
 
 /// The listing of the cards to keep track of
@@ -37,12 +39,29 @@ impl Component for CardsListing {
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         // Get a reference to localStorage
-        let storage = StorageService::new(Area::Local).expect("Cannot use localStorage");
+        let mut storage = StorageService::new(Area::Local).expect("Cannot use localStorage");
 
         // Load the cards from localStorage
         let mut cards = {
-            if let Json(Ok(loaded_cards)) = storage.restore(CARDS_KEY) {
+            if let Json(Ok(loaded_cards)) = storage.restore(CARDS_KEY_V2) {
+                // If the cards already have the new format, return them
                 loaded_cards
+            } else if let Json(Ok(loaded_cards)) = storage.restore(CARDS_KEY_V1) {
+                // Tell the compiler about the type
+                // TODO improve or report bug/suggestion to rust lang
+                let loaded_cards: Vec<CardEntryV1> = loaded_cards;
+
+                let mut new_cards = vec![];
+
+                // Convert the old format to the new one
+                for card in loaded_cards {
+                    new_cards.push(CardEntryV1::retrofit_uuid(card));
+                }
+
+                // Persist the data (including the new UUIDs)
+                storage.store(CARDS_KEY_V2, Json(&new_cards));
+
+                new_cards
             } else {
                 // If no such entry exists, create a new one
                 Vec::new()
@@ -208,7 +227,7 @@ impl CardsListing {
         CardEntry::sum_all(&mut self.state.cards).unwrap();
 
         // Persist the data
-        self.storage.store(CARDS_KEY, Json(&self.state.cards));
+        self.storage.store(CARDS_KEY_V1, Json(&self.state.cards));
 
         // Do a fake render first
         self.state.real_pass = false;

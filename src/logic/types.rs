@@ -4,6 +4,42 @@ use uuid::Uuid;
 
 use super::calc::CardData;
 
+#[derive(Deserialize, Clone)]
+pub struct CardEntryV1 {
+    /// The name of the card
+    pub name: String,
+
+    /// The amount of cards in posession
+    pub have: usize,
+
+    /// The current level of the card
+    pub level: usize,
+
+    /// The rarity of the card
+    pub card_type: CardType,
+
+    /// The rarity of the card
+    pub rarity: Rarity,
+
+    /// Computed values
+    #[serde(skip)]
+    pub computed: Option<CardData>,
+}
+
+impl CardEntryV1 {
+    pub fn retrofit_uuid(self) -> CardEntry {
+        CardEntry {
+            uuid: Uuid::new_v4(),
+            name: self.name,
+            have: self.have,
+            level: self.level,
+            card_type: self.card_type,
+            rarity: self.rarity,
+            computed: self.computed,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 pub struct CardEntry {
     /// The UUID of the card  
