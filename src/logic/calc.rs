@@ -79,8 +79,8 @@ impl CardEntry {
     //  FnMut(&Self, &Self) -> cmp::Ordering
     pub fn sort_by_remaining(
         arena: Option<&Arena>,
-    ) -> Box<dyn FnMut(&Self, &Self) -> cmp::Ordering + '_> {
-        Box::new(move |a: &Self, b: &Self| {
+    ) -> impl FnMut(&Self, &Self) -> cmp::Ordering + '_ {
+        move |a: &Self, b: &Self| {
             // Handle legendary cards
             if a.rarity == Rarity::Legendary {
                 if b.rarity == Rarity::Legendary {
@@ -102,7 +102,7 @@ impl CardEntry {
 
             // Compare the cards
             get_remaining(a).partial_cmp(&get_remaining(b)).unwrap()
-        })
+        }
     }
 
     pub fn sum_all(list: &mut Vec<Self>) -> Result<()> {
