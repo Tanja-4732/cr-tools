@@ -29,16 +29,27 @@ crate-type = ["cdylib", "rlib"]
 
 
 [dependencies]
+# Core libs
+libocc = "0.4"
+
+# Web libs
 yew = "0.17"
 wasm-bindgen = "0.2"
-libocc = "0.4"
+
+# Static data
 strum = "0.20.0"
 strum_macros = "0.20.1"
+lazy_static = "1.4.0"
+
+# Serde
 serde = "1"
 serde_derive = "1"
-chrono = { version = "0.4", features = ["wasmbind"] }
+
+# Error handeling
 anyhow = "1.0.38"
 thiserror = "1.0"
+
+# Other
 float-pretty-print = "0.1.0"
 uuid = { version = "0.8", features = ["serde", "v4", "wasm-bindgen"] }
-lazy_static = "1.4.0"
+chrono = { version = "0.4", features = ["wasmbind"] }
