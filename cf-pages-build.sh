@@ -18,8 +18,8 @@ export PATH=$PATH:$HOME/.cargo/bin
 # # Install wasm-pack
 # curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-# # Install the architecture wasm32-unknown-unknown
-# rustup target add wasm32-unknown-unknown
+# Install the architecture wasm32-unknown-unknown
+rustup target add wasm32-unknown-unknown
 
 # # Install trunk & its dependencies
 # cargo install --locked wasm-bindgen-cli trunk
@@ -37,6 +37,8 @@ cargo install --locked trunk
 
 # # Weird wasm-bindgen fix
 # cargo update -p wasm-bindgen
+
+echo "Finished installing build dependencies for Cloudflare pages."
 
 # Build the project
 trunk build -d public --release
